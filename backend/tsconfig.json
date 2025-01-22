@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // Compilar a ES6
+    "module": "commonjs", // Usar módulos comunes
+    "esModuleInterop": true, // Soportar importación de módulos comunes
+    "strict": true, // Habilitar todas las comprobaciones estrictas
+    "skipLibCheck": true, // Saltar la verificación de tipos en bibliotecas
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist", // Directorio donde se generarán los archivos compilados
+    "rootDir": "./src" // Directorio donde se encuentran los archivos fuente
+  },
+  "include": ["src/**/*.ts"], // Incluir todos los archivos .ts en src
+  "exclude": ["node_modules"] // Excluir node_modules
+}
