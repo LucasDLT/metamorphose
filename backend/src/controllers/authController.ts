@@ -1,11 +1,29 @@
-import {Request, Response} from 'express';
-import bcrypt from 'bcryptjs'
-import {mockAdmin} from '../data/mockAdmin';
+import { Request, Response } from "express";
+import { loginAdmin, registerAdmin } from "../services/authService";
 
-export const login = (req: Request, res: Response)=>{
-    const {email, password} = req.body;
+//controlador para el login de metamorphose
+export const login = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
 
-    if(email !==mockAdmin.email){
-        return res.status(401).json({message:"correo electronico incorrecto"})
-    }
-}
+  try {
+    const { token, message } = await loginAdmin(email, password);
+     res.json({ message, token });
+  } catch (err) {
+     res.status(400).json({ message: err });
+  }
+};
+
+//controlador para el registro de metamorphose
+
+export const register = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+
+  try {
+    const newUser = await registerAdmin(email, password);
+     res
+      .status(201)
+      .json({ message: "usuario registrado con exito", user: newUser });
+  } catch (error) {
+     res.status(400).json({ message: error });
+  }
+};

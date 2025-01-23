@@ -1,9 +1,10 @@
 import express from "express";
-import router from "./routes/router";
+import authRoutes from "./routes/authRoutes"
 
 const server = express(); 
 
-server.use(router);
+server.use(express.json())
+server.use("/metamorphose",authRoutes)
 
 
 export default server;
