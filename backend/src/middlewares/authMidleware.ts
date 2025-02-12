@@ -1,32 +1,43 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { CustomRequest, User } from "../types/user.t";
+import { CustomRequest } from "../types/user.t";
+import { AppDataSource } from "../config/data-source";
+import { User } from "../models/user";
+
+//instanciamos el repositorio
+const userRepository = AppDataSource.getRepository(User);
 
 // Middleware para proteger las rutas que requieren autenticación
-export const authenticateJWT = (
+export const authenticateJWT = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-): void => {
+): Promise<void> => {
   // Buscar el token en las cabeceras de la solicitud
   const token = req.header("Authorization")?.replace("Bearer ", "") ?? "";
   // Si no se proporciona un token, retornamos un error 401
   if (!token) {
-     res
+    res
       .status(401)
       .json({ message: "Acceso denegado. Token no proporcionado." });
   }
 
-  // Verificar si el token es válido
-  jwt.verify(token, "mi_clave_secreta", (err, decoded) => {
-    if (err) {
-      return res
-        .status(403)
-        .json({ message: "Token no válido. Acceso denegado." });
+  try {
+    // Verificar y decodificar el token de forma sincrónica
+    const decoded = jwt.verify(token, "mi_clave_secreta") as {
+      id: number;
+      email: string;
+    };
+    const user = await userRepository.findOne({ where: { id: decoded.id } });
+
+    if (!user) {
+      res.status(401).json({ message: "Usuario no encontrado." });
     }
-    const user = decoded as User;  // Hacemos el cast a `User`
-    // Si el token es válido, agregamos la información del usuario al objeto req
-    req.user = user ; // Almacenamos el usuario dentro del objeto req
-    next(); // Continuamos a la siguiente función (en este caso, la ruta protegida)
-  });
+
+    // Agregar la información del usuario a la solicitud
+    req.user = user as User;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Acceso denegado. Token inválido." });
+  }
 };

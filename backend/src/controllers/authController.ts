@@ -5,11 +5,17 @@ import { loginAdmin, registerAdmin } from "../services/authService";
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    res.status(400).json({ message: "Email y contraseña son requeridos" });
+    return;
+  }
+
   try {
     const { token, message } = await loginAdmin(email, password);
-     res.json({ message, token });
+    res.json({ message, token });
   } catch (err) {
-     res.status(400).json({ message: err });
+    console.error("error en login",err);
+    res.status(400).json({ message: err });
   }
 };
 
@@ -17,13 +23,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
-
+  if (!email || !password) {
+    res.status(400).json({ message: "Email y contraseña son requeridos" });
+    return;
+  }
   try {
     const newUser = await registerAdmin(email, password);
-     res
+    res
       .status(201)
       .json({ message: "usuario registrado con exito", user: newUser });
   } catch (error) {
-     res.status(400).json({ message: error });
+    res.status(400).json({ message: error });
   }
 };
