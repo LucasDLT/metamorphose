@@ -16,3 +16,7 @@ export const AppDataSource = new DataSource({
     migrations: [],
     subscribers: [],
 })  
+
+export const UserModel = AppDataSource.getRepository(User);
+export const ImageModel = AppDataSource.getRepository(Image);
+export const MailModel = AppDataSource.getRepository(Mail);
