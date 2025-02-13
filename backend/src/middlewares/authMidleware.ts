@@ -20,6 +20,10 @@ export const authenticateJWT = async (
     res
       .status(401)
       .json({ message: "Acceso denegado. Token no proporcionado." });
+      console.log(req.headers.authorization);
+      console.log(
+        "Acceso denegado. Token no proporcionado.");
+      
   }
 
   try {
