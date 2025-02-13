@@ -1,44 +1,37 @@
-import { Image } from "../types/image.t";
-
+import { AppDataSource } from "../config/data-source";
+import { Image } from "../models/image";
 // Array en memoria para simular la base de datos
-let images: Image[] = [];
+let imageRepository= AppDataSource.getRepository(Image);
 
 // Función para crear una nueva imagen
-export const createImage = (imageData: Omit<Image, "id" | "createdAt">): Image => {
-  const newImage: Image = {
-    id: images.length + 1,  // Se asigna un ID simple
-    ...imageData,
-    createdAt: new Date().toISOString(),  // Establecer la fecha de creación
-  };
-  images.push(newImage);
-  return newImage;
-};
+export const createImage = (imageData: Omit<Image, "id" | "createdAt">): Promise<Image> => {
+  const newImage = imageRepository.create(imageData);
+  return imageRepository.save(newImage);
 
+
+}
 // Función para obtener todas las imágenes
-export const getAllImages = (): Image[] => {
-  return images;
+export const getAllImages = async ():Promise <Image[]> => {
+  return await imageRepository.find();
 };
 
 // Función para obtener una imagen por su ID
-export const getImageById = (id: number): Image | undefined => {
-  return images.find((image) => image.id === id);
+export const getImageById = async (id: number, updatedData: Partial<Image>):Promise <Image | null> => {
+  return await imageRepository.findOneBy({ id });
 };
 
 // Función para actualizar una imagen
-export const updateImage = (id: number, updatedData: Partial<Image>): Image | undefined => {
-  const index = images.findIndex((image) => image.id === id);
-  if (index === -1) return undefined;
+export const updateImage = async (id: number, updatedData: Partial<Image>):Promise <Image | null> => {
+  const image = await imageRepository.findOneBy({ id });
+  if (!image) return null;
 
-  const updatedImage = { ...images[index], ...updatedData };
-  images[index] = updatedImage;
-  return updatedImage;
+  Object.assign(image, updatedData);
+  return await imageRepository.save(image);
 };
 
 // Función para eliminar una imagen
-export const deleteImage = (id: number): boolean => {
-  const index = images.findIndex((image) => image.id === id);
-  if (index === -1) return false;
+export const deleteImage = async (id: number):Promise <boolean> =>{
+  const index = await imageRepository.delete(id);
+  return index.affected !== 0;
 
-  images.splice(index, 1);  // Elimina la imagen del array
-  return true;
 };
