@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { CustomRequest } from "../types/user.t";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../models/user";
+import { ErrorRequestHandler } from "express";
 
 //instanciamos el repositorio
 const userRepository = AppDataSource.getRepository(User);
@@ -11,7 +12,7 @@ const userRepository = AppDataSource.getRepository(User);
 export const authenticateJWT = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction 
 ): Promise<void> => {
   // Buscar el token en las cabeceras de la solicitud
   const token = req.header("Authorization")?.replace("Bearer ", "") ?? "";
@@ -43,5 +44,15 @@ export const authenticateJWT = async (
     next();
   } catch (error) {
     res.status(401).json({ message: "Acceso denegado. Token inválido." });
+  }
+};
+
+
+export const multerErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  if (err) {
+    console.error("Error en Multer/Cloudinary:", err);
+    res.status(500).json({ message: "Error al procesar la imagen." });
+  } else {
+    next();
   }
 };

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { Image } from "../models/image";
 import { createImage, getAllImages, getImageById, updateImage, deleteImage } from "../services/imageService";
+import { v2 as cloudinary } from 'cloudinary';
 // Obtener todas las fotos del admin
 export const getAdminPhotos = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -13,16 +13,67 @@ export const getAdminPhotos = async (req: Request, res: Response): Promise<void>
 
 // Subir una nueva foto
 export const uploadPhoto = async (req: Request, res: Response): Promise<void> => {
-  const { title, history, url, active} = req.body;
-
-  if (!title || !history || !url) {
-     res.status(400).json({ message: "Título, historia y URL son requeridos." });
+  console.log("Solicitud recibida en uploadPhoto")
+  const { title, history} = req.body;
+  console.log("Enviando archivo:", req.file);
+  
+  const active = req.body.active==="true"
+  
+  if (!title || !history  || !req.file) {
+    console.log("Faltan campos obligatorios:", { title, history, file: req.file });
+    res.status(400).json({ message: "Título, historia y archivo de imagen son requeridos." });
+    return
   }
 
   try {
-    const newImage = await createImage({ title, history, url, active });
-    res.status(201).json({ message: "Foto subida con éxito.", photo: newImage });
+    console.log("Archivo recibido:", req.file);
+    if (!req.file) {
+      res.status(400).json({ message: "Archivo de imagen no proporcionado." });
+      return;
+    }
+    cloudinary.uploader.upload(req.file.path, async (error, result) => {
+      if (error) {
+        console.error("Error al subir la foto:", JSON.stringify(error, null, 2));
+        res.status(500).json({ message: "Error al subir la foto." });
+        return;
+      }
+      console.log("Resultado de Cloudinary:", JSON.stringify(result, null, 2));
+    
+      // Aquí el resultado debe contener la URL de la imagen subida
+      const imageUrl = result?.secure_url;
+      console.log("URL de la imagen:", imageUrl);
+      
+      if (!imageUrl) {
+        console.error("No se encontró URL en el resultado de Cloudinary.");
+        res.status(500).json({ message: "Error al subir la foto, no se encontró URL." });
+        return;
+      }
+    
+      // Resto de la lógica para guardar la imagen en tu base de datos
+      const newImage = await createImage({ title, history, url: imageUrl, active });
+      console.log("Nueva imagen creada:", JSON.stringify(newImage, null, 2));
+      res.status(201).json({ message: "Foto subida con éxito.", photo: newImage });
+    });
+    
+
+   {/* cloudinary.uploader.upload(req.file.path, async (error, result)=>{
+      if (error) {
+        console.error("Error al subir la foto:", error);
+        res.status(500).json({ message: "Error al subir la foto." });
+      }
+      console.log("Resultado de Cloudinary:", JSON.stringify(result, null, 2));
+
+      const imageUrl = result?.secure_url
+      if (!imageUrl) {
+        res.status(500).json({ message: "Error al subir la foto." });
+        return;
+      }
+      const newImage = await createImage({ title, history, url: imageUrl, active });
+      res.status(201).json({ message: "Foto subida con éxito.", photo: newImage });
+    });*/}
+
   } catch (error) {
+    console.error("Error en el proceso de subida:", error);
     res.status(500).json({ message: "Error al subir la foto." });
   }
 };
