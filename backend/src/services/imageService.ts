@@ -6,6 +6,8 @@ let imageRepository= AppDataSource.getRepository(Image);
 // Función para crear una nueva imagen
 export const createImage = (imageData: Omit<Image, "id" | "createdAt">): Promise<Image> => {
   const newImage = imageRepository.create(imageData);
+  console.log(newImage);
+  
   return imageRepository.save(newImage);
 
 
