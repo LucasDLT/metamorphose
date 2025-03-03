@@ -74,9 +74,13 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
 export const updatePhoto = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { title, history, url, active, category } = req.body;
+  console.log("se recibe esto en actualizar:", JSON.stringify(req.body, null, 2));
+  
 
   try {
     const updatedImage = await updateImage(parseInt(id), { title, history, url, active, category });
+    console.log("se recibe esto en actualizar:", JSON.stringify(updatedImage, null, 2));
+    
 
     if (!updatedImage) {
        res.status(404).json({ message: "Foto no encontrada." });
