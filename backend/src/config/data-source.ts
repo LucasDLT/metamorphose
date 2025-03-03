@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { Image } from "../models/image";
 import { User } from "../models/user";
 import { Mail } from "../models/mail";
+import { Category } from "../models/category";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -12,11 +13,13 @@ export const AppDataSource = new DataSource({
     database: "metamorphose",
     synchronize: true,
     logging: true,
-    entities: [Image, User, Mail],
+    entities: [Image, User, Mail, Category],
     migrations: [],
     subscribers: [],
+    //dropSchema: true,    // Borra todas las tablas antes de sincronizar
 })  
 
 export const UserModel = AppDataSource.getRepository(User);
 export const ImageModel = AppDataSource.getRepository(Image);
 export const MailModel = AppDataSource.getRepository(Mail);
+export const CategoryModel = AppDataSource.getRepository(Category);

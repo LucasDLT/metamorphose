@@ -1,15 +1,22 @@
 import { AppDataSource } from "../config/data-source";
 import { Image } from "../models/image";
+import { Category } from "../models/category";
 // Array en memoria para simular la base de datos
 let imageRepository= AppDataSource.getRepository(Image);
+let categoryRepository= AppDataSource.getRepository(Category);
+
 
 // Función para crear una nueva imagen
-export const createImage = (imageData: Omit<Image, "id" | "createdAt">): Promise<Image> => {
-  const newImage = imageRepository.create(imageData);
-  console.log(newImage);
+export const createImage = async (imageData: Omit<Image, "id" | "createdAt">): Promise<Image> => {
+  let category = await categoryRepository.findOne({ where: { name: imageData.category.name } });
   
-  return imageRepository.save(newImage);
+  if (!category) {
+    category = categoryRepository.create({ name: imageData.category.name });
+    await categoryRepository.save(category);
+  }
 
+  const newImage = imageRepository.create({ ...imageData, category });
+  return imageRepository.save(newImage);
 
 }
 // Función para obtener todas las imágenes
@@ -23,17 +30,36 @@ export const getImageById = async (id: number, updatedData: Partial<Image>):Prom
 };
 
 // Función para actualizar una imagen
-export const updateImage = async (id: number, updatedData: Partial<Image>):Promise <Image | null> => {
-  const image = await imageRepository.findOneBy({ id });
+export const updateImage = async (id: number, updatedData: Partial<Image>): Promise<Image | null> => {
+  const image = await imageRepository.findOne({
+    where: { id },
+    relations: ["category"], // Asegura que trae la relación
+  });
+
   if (!image) return null;
 
+  // Verificar si se pasó una nueva categoría
+  if (updatedData.category && typeof updatedData.category === "string") {
+    let category = await categoryRepository.findOne({ where: { name: updatedData.category } });
+
+    if (!category) {
+      category = categoryRepository.create({ name: updatedData.category });
+      await categoryRepository.save(category);
+    }
+
+    updatedData.category = category; // Asigna la nueva categoría
+  }
+
   Object.assign(image, updatedData);
-  return await imageRepository.save(image);
+   await imageRepository.save(image);
+
+  return image;
 };
+
 
 // Función para eliminar una imagen
 export const deleteImage = async (id: number):Promise <boolean> =>{
   const index = await imageRepository.delete(id);
   return index.affected !== 0;
 
-};
+}
