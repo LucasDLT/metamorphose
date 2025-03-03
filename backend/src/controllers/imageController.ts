@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import { createImage, getAllImages, getImageById, updateImage, deleteImage } from "../services/imageService";
 import { v2 as cloudinary } from 'cloudinary';
+import { AppDataSource } from "../config/data-source";
+import { Category } from "../models/category";
+import { createCategory } from "../services/categoryService";
+
+let categoryRepository = AppDataSource.getRepository(Category);
+
 // Obtener todas las fotos del admin
 export const getAdminPhotos = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -14,12 +20,12 @@ export const getAdminPhotos = async (req: Request, res: Response): Promise<void>
 // Subir una nueva foto
 export const uploadPhoto = async (req: Request, res: Response): Promise<void> => {
   console.log("Solicitud recibida en uploadPhoto")
-  const { title, history} = req.body;
+  const { title, history, category} = req.body;
   console.log("Enviando archivo:", req.file);
   
   const active = req.body.active==="true"
   
-  if (!title || !history  || !req.file) {
+  if (!title || !history  || !req.file ) {
     console.log("Faltan campos obligatorios:", { title, history, file: req.file });
     res.status(400).json({ message: "Título, historia y archivo de imagen son requeridos." });
     return
@@ -48,30 +54,16 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
         res.status(500).json({ message: "Error al subir la foto, no se encontró URL." });
         return;
       }
+        // Verificar o crear la categoría antes de asignarla
+        const categoryCreated = await createCategory(category);
+      
     
       // Resto de la lógica para guardar la imagen en tu base de datos
-      const newImage = await createImage({ title, history, url: imageUrl, active });
+      const newImage = await createImage({ title, history, url: imageUrl, active, category: categoryCreated });
       console.log("Nueva imagen creada:", JSON.stringify(newImage, null, 2));
       res.status(201).json({ message: "Foto subida con éxito.", photo: newImage });
     });
     
-
-   {/* cloudinary.uploader.upload(req.file.path, async (error, result)=>{
-      if (error) {
-        console.error("Error al subir la foto:", error);
-        res.status(500).json({ message: "Error al subir la foto." });
-      }
-      console.log("Resultado de Cloudinary:", JSON.stringify(result, null, 2));
-
-      const imageUrl = result?.secure_url
-      if (!imageUrl) {
-        res.status(500).json({ message: "Error al subir la foto." });
-        return;
-      }
-      const newImage = await createImage({ title, history, url: imageUrl, active });
-      res.status(201).json({ message: "Foto subida con éxito.", photo: newImage });
-    });*/}
-
   } catch (error) {
     console.error("Error en el proceso de subida:", error);
     res.status(500).json({ message: "Error al subir la foto." });
@@ -81,10 +73,10 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
 // Actualizar una foto existente
 export const updatePhoto = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  const { title, history, url } = req.body;
+  const { title, history, url, active, category } = req.body;
 
   try {
-    const updatedImage = await updateImage(parseInt(id), { title, history, url });
+    const updatedImage = await updateImage(parseInt(id), { title, history, url, active, category });
 
     if (!updatedImage) {
        res.status(404).json({ message: "Foto no encontrada." });

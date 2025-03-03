@@ -3,7 +3,9 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  ManyToOne,
 } from "typeorm";
+import { Category } from "./category";
 
 @Entity()
 export class Image {
@@ -24,4 +26,9 @@ export class Image {
 
   @Column({ default: true })
   active: boolean; // esta propiedad es para que el admin pueda ocultar las imagenes, asi puede subir imagenes y dejarlas ocultas de los visitantes.
+
+  
+  // Relación con categorías (muchas imágenes pueden tener una categoría)
+  @ManyToOne(() => Category, (category) => category.images, { eager: true })
+  category: Category;
 }
