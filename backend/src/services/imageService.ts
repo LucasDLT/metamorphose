@@ -51,6 +51,8 @@ export const updateImage = async (id: number, updatedData: Partial<Image>): Prom
   }
 
   Object.assign(image, updatedData);
+  console.log("datos actualizados", image);
+  
    await imageRepository.save(image);
 
   return image;
