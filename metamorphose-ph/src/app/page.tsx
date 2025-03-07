@@ -1,8 +1,8 @@
-import Navbar from "@/components/Navbar";
+import FormLoginRegister from "@/components/FormLogin-Register";
 export default function Home() {
   return (
 <div>
-  <Navbar/>
+  <FormLoginRegister/>
 </div>
   );
 }
