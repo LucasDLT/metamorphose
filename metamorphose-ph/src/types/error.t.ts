@@ -1,4 +1,5 @@
 export interface Ierror {
-  username?: string;
-  password?: string;
+  email?: string | undefined;
+  password?: string | undefined;
+  confirmPassword?: string | undefined;
 }
