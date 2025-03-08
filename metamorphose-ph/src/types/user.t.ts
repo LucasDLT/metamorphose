@@ -1,4 +1,5 @@
 export interface Iuser {
-  username?: string;
-  password?: string;
+  email?: string | undefined;
+  password?: string | undefined;
+  confirmPassword?: string | undefined;
 }
