@@ -57,7 +57,7 @@ export default function FormRegister() {
   };
 
   return (
-    <form id="formRegister" action="" onSubmit={handleSubmit} method="post">
+    <form id="formRegister" onSubmit={handleSubmit} method="post">
       <label className="text-white">FormRegister</label>
       <div>
         <label >EMAIL</label>
