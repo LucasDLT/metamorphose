@@ -1,8 +1,10 @@
-import FormLoginRegister from "@/components/FormLogin-Register";
+import FormRegister from "@/components/FormRegister";
+import FormLogin from "@/components/FormLogin";
 export default function Home() {
   return (
 <div>
-  <FormLoginRegister/>
+  <FormLogin/>
+  <FormRegister/>
 </div>
   );
 }
