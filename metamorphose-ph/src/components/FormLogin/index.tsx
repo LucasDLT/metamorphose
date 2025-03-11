@@ -1,10 +1,9 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { Ilogin } from "@/types/login";
 import { loginSchema } from "@/validation/loginSchema";
 import { Inputs } from "@/types/typeErrors";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { useRouter } from "next/navigation";
 export default function FormLogin() {
   const {
     register,
@@ -12,7 +11,7 @@ export default function FormLogin() {
     formState: { errors },
   } = useForm<Inputs>({ resolver: zodResolver(loginSchema) });
   const PORT = process.env.NEXT_PUBLIC_API_URL;
-
+  const router = useRouter();
   async function postForm(
     data: Inputs
   ) {
@@ -33,8 +32,10 @@ export default function FormLogin() {
         throw new Error("Hubo un error en la solicitud");
       }
       const dataLogin = await response.json()
-      console.log("login", dataLogin);
-      
+      console.log("login", dataLogin.token);
+      localStorage.setItem("token-admin", dataLogin.token);
+      router.push("/");
+      router.refresh();
     } catch (error) {
       console.error("Error en el login:", error);
       alert("Error en el login, vuelve a intentarlo");

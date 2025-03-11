@@ -1,19 +1,56 @@
-import Image from "next/image"
-import Titulo from "../../../public/Titulo.png"
-import Logo from "../../../public/Logo.png"
+"use client";
+import Link from "next/link";
+import { useEffect } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { set } from "zod";
+interface token {
+  token: string;
+}
 
 export default function Navbar() {
-    return (
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <Image 
-        src={Titulo} 
-        alt={"Titulo Metamorphose"}
-        width={500} 
-        className=""/>
-        <Image 
-        src={Logo} 
-        alt={"Logo Metamorphose"}
-        width={60}/>
+  const [token, setToken] = useState<token | null>(null);
+  const router = useRouter();
+  useEffect(() => {
+
+      const storedToken = localStorage.getItem("token-admin");
+      if (storedToken) {
+        setToken({ token: storedToken });
+      }
+    const handleStorageChange = () => {
+        const updatedToken = localStorage.getItem("token-admin");
+       setToken(updatedToken ? { token: updatedToken } : null);
+}
+window.addEventListener("storage", handleStorageChange);
+return () => {
+  window.removeEventListener("storage", handleStorageChange);
+};
+  }, []);
+
+  const logOut = () => {
+    localStorage.removeItem("token-admin");
+    setToken(null);
+    router.push("/");
+  };
+  return (
+    <nav>
+      <div>
+        <Link href={"/forms"}>FORMULARIOS</Link>
       </div>
-    )
+      {token && (
+        <div>
+          <Link href={"/carga"}>CARGA DE IMAGENES</Link>
+          <Link href={"/multimedia"}>VISTA MULTIMEDIA</Link>
+          <Link href={"/edicion"}>EDICION DE UBICACION</Link>
+        </div>
+      )}
+      {token && (
+        <div>
+          <Link href={"/"} onClick={logOut}>
+            LOGOUT
+          </Link>
+        </div>
+      )}
+    </nav>
+  );
 }
