@@ -4,20 +4,26 @@ import { loginSchema } from "@/validation/loginSchema";
 import { Inputs } from "@/types/typeErrors";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { Context } from "@/context/context";
+
+
 export default function FormLogin() {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>({ resolver: zodResolver(loginSchema) });
+  
+
+  const {setToken} =useContext(Context);
+
   const PORT = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
-  async function postForm(
-    data: Inputs
-  ) {
 
+  async function postForm(data: Inputs) {
     console.log(data);
-    
+
     try {
       const response = await fetch(`${PORT}/login`, {
         method: "POST",
@@ -31,11 +37,11 @@ export default function FormLogin() {
         console.error("Error en la solicitud", errorResponse);
         throw new Error("Hubo un error en la solicitud");
       }
-      const dataLogin = await response.json()
+      const dataLogin = await response.json();
       console.log("login", dataLogin.token);
       localStorage.setItem("token-admin", dataLogin.token);
+      setToken({token:dataLogin.token});
       router.push("/");
-      router.refresh();
     } catch (error) {
       console.error("Error en el login:", error);
       alert("Error en el login, vuelve a intentarlo");
