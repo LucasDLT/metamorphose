@@ -103,8 +103,24 @@ export const deletePhoto = async (req: Request, res: Response): Promise<void> =>
        res.status(404).json({ message: "Foto no encontrada." });
     }
 
-    res.json({ message: "Foto eliminada con éxito." });
+    const updatePhotos = await getAllImages();
+
+    res.json({ message: "Foto eliminada con éxito.", photos: updatePhotos });
+
   } catch (error) {
     res.status(500).json({ message: "Error al eliminar la foto." });
+  }
+};
+
+export const getPhotoById = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const photo = await getImageById(parseInt(id));
+    if (!photo) {
+       res.status(404).json({ message: "Foto no encontrada." });
+    }
+    res.json(photo);
+  } catch (error) {
+    res.status(500).json({ message: "Error al obtener la foto." });
   }
 };

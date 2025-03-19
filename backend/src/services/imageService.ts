@@ -25,7 +25,7 @@ export const getAllImages = async ():Promise <Image[]> => {
 };
 
 // Función para obtener una imagen por su ID
-export const getImageById = async (id: number, updatedData: Partial<Image>):Promise <Image | null> => {
+export const getImageById = async (id: number):Promise <Image | null> => {
   return await imageRepository.findOneBy({ id });
 };
 
