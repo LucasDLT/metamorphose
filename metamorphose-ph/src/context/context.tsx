@@ -23,7 +23,7 @@ export interface ICategory {
 export interface IContextProps {
   token: Itoken | null;
   setToken: (token: Itoken | null) => void;
-  fotos: Ifotos[];
+  fotos: Ifotos[] | [];
   setFotos: (fotos: Ifotos[]) => void;
 }
 export const Context = createContext<IContextProps>({} as IContextProps);
