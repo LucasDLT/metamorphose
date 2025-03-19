@@ -1,6 +1,6 @@
 import router from '../routes/router';
 import { authenticateJWT, multerErrorHandler } from '../middlewares/authMidleware';
-import { getAdminPhotos, uploadPhoto, updatePhoto, deletePhoto } from "../controllers/imageController"; 
+import { getAdminPhotos, uploadPhoto, updatePhoto, deletePhoto, getPhotoById } from "../controllers/imageController"; 
 import upload from '../config/multer';
 
 // Ruta para obtener todas las fotos del admin (protegida)
@@ -15,5 +15,7 @@ router.put("/photos/:id", authenticateJWT, updatePhoto);
 
 // Ruta para eliminar una foto (protegida)
 router.delete("/photos/:id", authenticateJWT, deletePhoto);
+
+router.get("/photos/id/:id", authenticateJWT, getPhotoById);
 
 export default router;
