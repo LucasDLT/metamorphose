@@ -13,7 +13,7 @@ export default function Navbar() {
     router.push("/");
   };
   return (
-    <nav>
+    <nav className="gap-1 grid text-xs p-4 my-8 mx-8 text-right top-0 right-0 absolute border-2 border-gray-500">
       {!token && (
         <div>
           <Link href={"/forms"}>FORMULARIOS</Link>
