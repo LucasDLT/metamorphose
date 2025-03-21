@@ -40,18 +40,16 @@ export default function Multimedia() {
   };
 
   return (
-    <div>
+    <div className="bg-gray-900">
       {token ? (
-        <div>
-          <h1>Vista Multimedia</h1>
+        <div className="grid grid-cols-6">
 
           {Array.isArray(localFoto) && localFoto.length > 0 ? (
-            <div>
-              {localFoto.map((foto) => (
+              localFoto.map((foto) => (
                 <Card
                   key={foto.id}
-                  url={foto.url}
-                  title={foto.title}
+                  url={foto.url!}
+                  title ={foto.title!}
                   history={foto.history}
                   category={foto.category}
                   createdAt={foto.createdAt}
@@ -60,8 +58,7 @@ export default function Multimedia() {
                   handleUpdate={()=>handleUpdate(foto.id as number)}
                   
                 />
-              ))}
-            </div>
+              ))
           ) : (
             <h1>No hay fotos en la base de datos</h1>
           )}

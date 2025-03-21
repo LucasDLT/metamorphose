@@ -75,8 +75,8 @@ export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
       <h1>VISTA IMAGEN POR ID</h1>
       {dataFetch ? (
         <Card
-          url={dataFetch?.url}
-          title={dataFetch?.title}
+          url={dataFetch?.url as string}
+          title={dataFetch?.title as string}
           history={dataFetch?.history}
           category={dataFetch?.category}
           createdAt={dataFetch?.createdAt}
