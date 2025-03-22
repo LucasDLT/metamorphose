@@ -71,8 +71,7 @@ export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
   }
 
   return (
-    <div>
-      <h1>VISTA IMAGEN POR ID</h1>
+    <div className="flex w-96 border border-gray-500">
       {dataFetch ? (
         <Card
           url={dataFetch?.url as string}
@@ -84,8 +83,15 @@ export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
       ) : (
         <div>No se encontraron datos</div>
       )}
+      <Card
+      url=""
+      title=""
+      history=""
+      category={dataFetch?.category}
+      createdAt={""}
+      />
     </div>
   );
 };
 
-export default ImageById;
+export default  ImageById;

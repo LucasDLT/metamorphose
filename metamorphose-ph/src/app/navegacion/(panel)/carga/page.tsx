@@ -125,6 +125,6 @@ export default function Carga() {
         <button>cargar</button>
       </form>
 
-    </div>
+    </div> 
   );
 }
