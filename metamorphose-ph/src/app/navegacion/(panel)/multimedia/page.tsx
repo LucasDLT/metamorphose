@@ -3,11 +3,21 @@ import { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Context, Ifotos } from "@/context/context";
 import { Card } from "@/components/Card";
+import { Modal } from "@/components/Modal";
 
 export default function Multimedia() {
   const { token, fotos, setFotos } = useContext(Context);
-  const PORT = process.env.NEXT_PUBLIC_API_URL;
   const [localFoto, setLocalFoto] = useState<Ifotos[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedFoto, setSelectedFoto]=useState<Ifotos|null>(null)
+
+  const PORT = process.env.NEXT_PUBLIC_API_URL;
+
+  const toggleModal = (foto:Ifotos | null) =>{
+    setSelectedFoto(foto)
+    setIsModalOpen(!isModalOpen);
+  } 
+
   const router = useRouter();
 
   useEffect(() => {
@@ -40,28 +50,30 @@ export default function Multimedia() {
   };
 
   return (
-    <div className="bg-gray-900">
+    <div >
       {token ? (
         <div className="grid grid-cols-6">
-
           {Array.isArray(localFoto) && localFoto.length > 0 ? (
-              localFoto.map((foto) => (
-                <Card
-                  key={foto.id}
-                  url={foto.url!}
-                  title ={foto.title!}
-                  history={foto.history}
-                  category={foto.category}
-                  createdAt={foto.createdAt}
-                  active={foto.active}
-                  handleDelete={()=>handleDelete(foto.id as number)}
-                  handleUpdate={()=>handleUpdate(foto.id as number)}
-                  
-                />
-              ))
+            localFoto.map((foto) => (
+              <Card
+                key={foto.id}
+                url={foto.url!}
+                title={foto.title!}
+                history={foto.history}
+                category={foto.category}
+                createdAt={foto.createdAt}
+                active={foto.active}
+                handleDelete={() => handleDelete(foto.id as number)}
+                handleUpdate={() => handleUpdate(foto.id as number)}
+                handleModal={() => toggleModal(foto)}
+              />
+            ))
           ) : (
             <h1>No hay fotos en la base de datos</h1>
           )}
+          <Modal isOpen={isModalOpen} onClose={()=>toggleModal(null)}>
+            <img className="border border-white w-96 aspect-[9/9] object-cover" src={selectedFoto?.url} alt={selectedFoto?.title} />
+          </Modal>
         </div>
       ) : (
         <h1>No te encontras registrado</h1>
