@@ -2,8 +2,8 @@
 import Link from "next/link";
 const Layout = ({ children, }: Readonly <{ children: React.ReactNode }>) => {
   return (
-    <div className="bg-white bg-opacity-5 rounded backdrop-blur-md max-w-screen-xl mx-auto my-32 flex flex-col items-center justify-center">
-      <nav className="gap-4 flex justify-center p-4 text-sm">
+<div className=" mt-1 rounded max-w-screen-xl bg-transparent">
+      <nav className=" flex flex-row justify-evenly text-xs fixed top-40 left-32 ml-1 p-3 right-32 -mr-1.5 z-50 backdrop-blur-lg ">
         <Link href="/navegacion/multimedia">MULTIMEDIA</Link>
         <Link href="/navegacion/edicion">EDICION</Link>
         <Link href="/navegacion/carga">CARGA</Link>

@@ -13,25 +13,25 @@ export default function Navbar() {
     router.push("/");
   };
   return (
-    <nav className="gap-1 grid text-xs p-4 my-8 mx-8 text-right top-0 right-0 absolute border-2 border-gray-500">
+    <nav className="gap-1 grid text-xs p-4 gap-3 text-right fixed z-50 top-44 right-6 ">
       {!token && (
-        <div>
+        <div className="trasform hover:scale-110">
           <Link href={"/forms"}>FORMULARIOS</Link>
         </div>
       )}
 
-      <div>
+      <div className="trasform hover:scale-110 transition duration-500 ease-in-out">
         <Link href={"/"}>INICIO</Link>
       </div>
 
       {token && (
-        <div>
+        <div className="trasform hover:scale-110 transition duration-500 ease-in-out">
           <Link href={"/navegacion"}>PANEL</Link>
         </div>
       )}
 
       {token && (
-        <div>
+        <div className="trasform hover:scale-110 transition duration-500 ease-in-out">
           <Link href={"/"} onClick={logOut}>
             LOGOUT
           </Link>
