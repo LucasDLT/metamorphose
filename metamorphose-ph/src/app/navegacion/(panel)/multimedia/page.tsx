@@ -50,9 +50,9 @@ export default function Multimedia() {
   };
 
   return (
-    <div >
+    <div className="">
       {token ? (
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-6 overflow-y-scroll gap-1 mt-10 absolute top-40 left-32 bottom-0 right-28 z-0 h-screen " style={{scrollBehavior:"smooth"}}>
           {Array.isArray(localFoto) && localFoto.length > 0 ? (
             localFoto.map((foto) => (
               <Card
@@ -72,7 +72,7 @@ export default function Multimedia() {
             <h1>No hay fotos en la base de datos</h1>
           )}
           <Modal isOpen={isModalOpen} onClose={()=>toggleModal(null)}>
-            <img className="border border-white w-96 aspect-[9/9] object-cover" src={selectedFoto?.url} alt={selectedFoto?.title} />
+            <img className="w-96 aspect-[9/9] object-cover mt-16" src={selectedFoto?.url} alt={selectedFoto?.title} />
           </Modal>
         </div>
       ) : (
