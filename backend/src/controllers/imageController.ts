@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { createImage, getAllImages, getImageById, updateImage, deleteImage } from "../services/imageService";
 import { v2 as cloudinary } from 'cloudinary';
-import { AppDataSource } from "../config/data-source";
-import { Category } from "../models/category";
-import { createCategory } from "../services/categoryService";
 
-let categoryRepository = AppDataSource.getRepository(Category);
+import { createCategory } from "../services/categoryService";
+import { getNextGlobalOrderNumber, getNextOrderNumberInCategory } from "../services/orderImageService";
+import { swapCategoryOrder, swapGlobalOrder } from "../services/reorderImageService";
+
 
 // Obtener todas las fotos del admin
 export const getAdminPhotos = async (req: Request, res: Response): Promise<void> => {
@@ -56,10 +56,14 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
       }
         // Verificar o crear la categoría antes de asignarla
         const categoryCreated = await createCategory(category);
+
+        //numeros de orden en categoria y global
+      const orderNumberInCategory = await getNextOrderNumberInCategory(categoryCreated.id)
+      const orderNumberGlobal = await getNextGlobalOrderNumber()
       
     
       // Resto de la lógica para guardar la imagen en tu base de datos
-      const newImage = await createImage({ title, history, url: imageUrl, active, category: categoryCreated });
+      const newImage = await createImage({ title, history, url: imageUrl, active, category: categoryCreated, categoryOrder: orderNumberInCategory, globalOrder: orderNumberGlobal });
       console.log("Nueva imagen creada:", JSON.stringify(newImage, null, 2));
       res.status(201).json({ message: "Foto subida con éxito.", photo: newImage });
     });
@@ -73,12 +77,12 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
 // Actualizar una foto existente
 export const updatePhoto = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  const { title, history, url, active, category } = req.body;
+  const { title, history, url, active, category, categoryOrder, globalOrder} = req.body;
   console.log("se recibe esto en actualizar:", JSON.stringify(req.body, null, 2));
   
 
   try {
-    const updatedImage = await updateImage(parseInt(id), { title, history, url, active, category });
+    const updatedImage = await updateImage(parseInt(id), { title, history, url, active, category, categoryOrder, globalOrder });
     console.log("se recibe esto en actualizar:", JSON.stringify(updatedImage, null, 2));
     
 
@@ -111,6 +115,53 @@ export const deletePhoto = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ message: "Error al eliminar la foto." });
   }
 };
+
+//cambio de orden en categorias
+export const updateCategoryOrderPhoto = async( req: Request, res: Response):Promise<void>=>{
+const {id1, id2}= req.body;
+
+const imageId1 = parseInt(id1)
+const imageId2 = parseInt(id2)
+
+
+if (isNaN(imageId1)|| isNaN(imageId2)) {
+  res.status(400).json({message:"error con los Ids de las imagenes. No estan siendo tomados como numeros enteros"}) 
+}
+
+if (!imageId1 || !imageId2) {
+   res.status(400).json({message: "se requieren los Ids de ambas imagenes para intercambiar"})
+}
+try {
+  const swappedImages = await swapCategoryOrder(imageId1, imageId2)
+  res.status(200).json({message:"imagenes intercambiadas con exito", photos: swappedImages})
+} catch (error) {
+  res.status(500).json({message:"Error al intercambiar el orden de los imagenes"})
+}
+} 
+
+//cambio de orden global
+
+export const updateOrderGlobal = async(req:Request, res:Response):Promise<void>=>{
+  const {id1, id2}=req.body
+
+  const image1=parseInt(id1)
+  const image2=parseInt(id2)
+
+  if (isNaN(image1) || isNaN(image2)) {
+    res.status(400).json({message:"error con los ids de las imagenes. No estan siendo tomados como numeros enteros"})
+  }
+  if (!image1 || !image2) {
+    res.status(400).json({message:"se requieren los ids de ambas imagenes para intercambiar"})
+  }
+  try {
+    const swappedGlobal= await swapGlobalOrder(image1, image2)
+    res.status(200).json({message:"imagenes intercambiadas con exito", photos: swappedGlobal})
+  } catch (error) {
+    res.status(500).json({message:"Error al intercambiar el orden de las imagenes"})
+  }
+
+}
+
 
 export const getPhotoById = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;

@@ -47,7 +47,15 @@ export const updateImage = async (id: number, updatedData: Partial<Image>): Prom
       await categoryRepository.save(category);
     }
 
-    updatedData.category = category; // Asigna la nueva categoría
+    if (category.id !== image.category.id) {
+      updatedData.category = category;
+    }
+  }
+  if (!updatedData.categoryOrder) {
+    updatedData.categoryOrder = image.categoryOrder
+  }
+  if (!updatedData.globalOrder) {
+    updatedData.globalOrder = image.globalOrder
   }
 
   Object.assign(image, updatedData);
