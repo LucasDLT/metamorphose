@@ -65,7 +65,7 @@ export const FormRegister:React.FC<IformRegisterProps>=({setToggle})=> {
     >
       <label className="text-white text-center p-4">REGISTRATE</label>
 
-      <label className="text-xs">EMAIL</label>
+      <label className="text-xs">EMAIL *</label>
       <input
         type="text"
         value={form.email}
@@ -74,9 +74,9 @@ export const FormRegister:React.FC<IformRegisterProps>=({setToggle})=> {
         onChange={handleChange}
        className="rounded text-black"
       />
-      {errors.email ? <p className="text-red-500 text-xs">{errors.email}</p> : <p className="text-white text-xs">*</p>}
+      {errors.email ? <p className="text-red-500 text-xs">{errors.email}</p> : <p className="text-white text-xs my-2"></p>}
 
-      <label className="text-xs">CONTRASEÑA</label>
+      <label className="text-xs">CONTRASEÑA *</label>
       <input
         type="text"
         value={form.password}
@@ -85,9 +85,9 @@ export const FormRegister:React.FC<IformRegisterProps>=({setToggle})=> {
         onChange={handleChange}
         className="rounded text-black"
       />
-      {errors.password ? <p className="text-red-500 text-xs">{errors.password}</p> : <p className="text-white text-xs">*</p>}
+      {errors.password ? <p className="text-red-500 text-xs">{errors.password}</p> : <p className="text-white text-xs my-2"></p>}
 
-      <label className="text-xs">CONFIRMAR</label>
+      <label className="text-xs">CONFIRMAR *</label>
       <input
         type="text"
         value={form.confirmPassword}
@@ -99,10 +99,10 @@ export const FormRegister:React.FC<IformRegisterProps>=({setToggle})=> {
       {errors.password ? (
         <p className="text-red-500 text-xs">{errors.password}</p>
       ) : (
-        <p className="text-white text-xs">*</p>
+        <p className="text-white text-xs my-2"></p>
       )}
 
-      <button className="text-white text-sm hover:bg-gray-600 m-auto w-32 my-4">
+      <button className="text-white text-sm  border-gray-600 border-b m-auto w-1/2 h-8  rounded-full p-1 hover:border-none">
         registrarse
       </button>
       <h3 className="text-xs text-white text-center">

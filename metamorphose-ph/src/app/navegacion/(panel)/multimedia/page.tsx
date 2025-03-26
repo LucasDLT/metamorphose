@@ -52,7 +52,8 @@ export default function Multimedia() {
   return (
     <div className="">
       {token ? (
-        <div className="grid grid-cols-6 overflow-y-scroll gap-1 mt-10 absolute top-40 left-32 bottom-0 right-28 z-0 h-screen " style={{scrollBehavior:"smooth"}}>
+        <div className="grid grid-cols-6 overflow-y-scroll gap-1 z-0 h-screen"
+             style={{scrollBehavior:"smooth"}}>
           {Array.isArray(localFoto) && localFoto.length > 0 ? (
             localFoto.map((foto) => (
               <Card

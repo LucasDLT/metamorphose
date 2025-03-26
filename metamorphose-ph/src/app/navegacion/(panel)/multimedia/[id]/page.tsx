@@ -3,6 +3,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Context, Ifotos } from "@/context/context";
 import { Card } from "@/components/Card";
+import Image from "next/image"
 
 export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
@@ -71,26 +72,17 @@ export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
   }
 
   return (
-    <div className="flex w-96 border border-gray-500">
+    <>
       {dataFetch ? (
-        <Card
-          url={dataFetch?.url as string}
-          title={dataFetch?.title as string}
-          history={dataFetch?.history}
-          category={dataFetch?.category}
-          createdAt={dataFetch?.createdAt}
-        />
+     <div className="border-2 border-gray-400 w-2/3">
+      <Image className="h-4/5 rounded"  src={!dataFetch.url ? "" : dataFetch.url} alt={dataFetch.title ? dataFetch.title : ""} width={500} height={100} ></Image>
+      <h3>{dataFetch.title}</h3>
+     </div>
       ) : (
         <div>No se encontraron datos</div>
       )}
-      <Card
-      url=""
-      title=""
-      history=""
-      category={dataFetch?.category}
-      createdAt={""}
-      />
-    </div>
+      
+    </>
   );
 };
 

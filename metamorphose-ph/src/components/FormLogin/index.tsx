@@ -6,11 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { Context } from "@/context/context";
+import { Toaster, toast } from "sonner";
 
 interface FormLoginProps {
-  setToggle:React.Dispatch<React.SetStateAction<boolean>>
+  setToggle: React.Dispatch<React.SetStateAction<boolean>>;
 }
-export const FormLogin:React.FC<FormLoginProps> = ( {setToggle}) => {
+export const FormLogin: React.FC<FormLoginProps> = ({ setToggle }) => {
   const {
     register,
     handleSubmit,
@@ -42,6 +43,17 @@ export const FormLogin:React.FC<FormLoginProps> = ( {setToggle}) => {
       console.log("login", dataLogin.token);
       localStorage.setItem("token-admin", dataLogin.token);
       setToken({ token: dataLogin.token });
+      toast.success("Login exitoso", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+          height: "25px",
+          width: "200px",
+          backgroundColor: "#6666662f",
+          fontFamily:" afacad",
+        },
+      });
       router.push("/");
     } catch (error) {
       console.error("Error en el login:", error);
@@ -57,7 +69,7 @@ export const FormLogin:React.FC<FormLoginProps> = ( {setToggle}) => {
       <label className="text-white text-center m-6">LOGIN</label>
 
       <label className="text-white text-xs" htmlFor="email">
-        EMAIL
+        EMAIL *
       </label>
       <input
         type="email"
@@ -68,11 +80,11 @@ export const FormLogin:React.FC<FormLoginProps> = ( {setToggle}) => {
       {errors.email ? (
         <p className="text-red-500 text-xs">{errors.email?.message}</p>
       ) : (
-        <p className="text-white text-xs">*</p>
+        <p className="text-white text-xs my-2"> </p>
       )}
 
       <label className="text-white text-xs " htmlFor="password">
-        PASSWORD
+        PASSWORD *
       </label>
       <input
         type="text"
@@ -83,12 +95,18 @@ export const FormLogin:React.FC<FormLoginProps> = ( {setToggle}) => {
       {errors.password?.message ? (
         <p className="text-red-500 text-xs">{errors.password?.message}</p>
       ) : (
-        <p className="text-white text-xs">*</p>
+        <p className="text-white text-xs my-2"></p>
       )}
-      <button className="text-white text-sm hover:bg-gray-600 m-auto w-32 my-4">sign in</button>
+      <button className="text-white border-gray-600 border-b m-auto w-20 h-6 hover:border-none flex justify-center items-center p-2 m-1 rounded-lg">
+        sign in
+      </button>
       <h3 className="text-xs text-white text-center">
         ¿no estas registrado? hacelo
-        <button type="button" className="text-blue-500 m-1" onClick={() => setToggle(true)}>
+        <button
+          type="button"
+          className="text-blue-500 m-1"
+          onClick={() => setToggle(true)}
+        >
           aqui
         </button>
       </h3>
@@ -97,4 +115,4 @@ export const FormLogin:React.FC<FormLoginProps> = ( {setToggle}) => {
       </h4>
     </form>
   );
-}
+};
