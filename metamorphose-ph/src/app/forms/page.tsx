@@ -7,7 +7,7 @@ export default function Forms(){
     const [toggle, setToggle] = useState<boolean>(false);
 
     return(
-        <main className="grid grid-cols-1 gap-4 my-48">
+        <main className="grid grid-cols-1 gap-4 mt-20 font-afacad animate-move-left">
             {
                 !toggle
                 ?<FormLogin setToggle={setToggle}/>

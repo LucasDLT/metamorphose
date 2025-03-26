@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {ContextProvider} from "@/context/context";
 import Header from "@/components/Header";
-import Navbar from "@/components/Navbar";
-
+import { Toaster } from "sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,12 +26,36 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+      <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+      <link href="https://fonts.cdnfonts.com/css/bitterslide-evelwhite" rel="stylesheet"/>
+      <link href="https://fonts.cdnfonts.com/css/grandiflora-one" rel="stylesheet"/>
+      <link href="https://fonts.cdnfonts.com/css/vintage-glory" rel="stylesheet"/>
+      <link href="https://fonts.cdnfonts.com/css/cairo-play" rel="stylesheet"/>
+      <link href="https://fonts.cdnfonts.com/css/afacad" rel="stylesheet"/>
+                
+
+                
+                
+      </head>
       <ContextProvider>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Header />
           {children}
+          <Toaster 
+          position="top-right"
+          toastOptions={{
+            style: {
+              border: "1px solid #333",
+              padding: "16px",
+              color: "#333",
+              fontSize: "16px",
+            },
+            duration: 5000,
+            
+          }}/>
         </body>
       </ContextProvider>
     </html>

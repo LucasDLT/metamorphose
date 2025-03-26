@@ -27,7 +27,12 @@ export class Image {
   @Column({ default: true })
   active: boolean; // esta propiedad es para que el admin pueda ocultar las imagenes, asi puede subir imagenes y dejarlas ocultas de los visitantes.
 
-  
+  @Column({default: 0})
+  globalOrder: number;
+
+  @Column({default: 0})
+  categoryOrder: number;
+
   // Relación con categorías (muchas imágenes pueden tener una categoría)
   @ManyToOne(() => Category, (category) => category.images, { eager: true })
   category: Category;

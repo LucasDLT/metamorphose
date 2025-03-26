@@ -2,6 +2,7 @@
 import { useContext } from "react";
 import { useState } from "react";
 import { Context, Ifotos } from "@/context/context";
+import { toast } from "sonner";
 
 export default function Carga() {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
@@ -41,6 +42,18 @@ export default function Carga() {
 
     if (!formImg.url) {
       console.log("No se ha seleccionado ningun archivo");
+      toast.warning("No se ha seleccionado ningun archivo", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+          height: "40px",
+          width: "300px",
+          backgroundColor: "#6666662f",
+          fontFamily:" afacad",
+          padding: "10px",
+        },
+      })
       return;
     }
 
@@ -65,35 +78,74 @@ export default function Carga() {
           Authorization: `Bearer ${token?.token}`,
         },
         body: formData,
-    });
+      });
       const data: { photo: Ifotos } = await response.json();
       if (data.photo) {
-          setFotos([...fotos, data.photo as Ifotos]);
+        setFotos([...fotos, data.photo as Ifotos]);
       }
+      toast.success("Imagen cargada exitosamente", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+          height: "25px",
+          width: "200px",
+          backgroundColor: "#6666662f",
+          fontFamily:" afacad",
+        },
+      });
       console.log("response de la carga :", data.photo);
+      setFormImg({
+        title: "",
+        history: "",
+        category: "",
+        url: null,
+        createdAt: "",
+        active: true,
+      })
     } catch (error) {
+      toast.error("Error al cargar la imagen", { duration: 5000 });
       throw new Error("error en el post de imagenes" + error);
     }
   };
   return (
-    <div>
-      <h1>Carga de Imagenes</h1>
-
-      <div>
-          <label htmlFor="url">Vista previa de la imagen</label>
+    <div className="grid grid-cols-3 gap-20 mt-10">
+      <div
+        className="text-center bg-gradient-to-t from-zinc-900 via-black-900 to-black-900 rounded object-cover "
+        style={{ width: "300px", height: "400px" }}
+      >
         {formImg.url && (
-          <img src={URL.createObjectURL(formImg.url)} alt="preview" className="w-44" />
+          <img
+            src={URL.createObjectURL(formImg.url)}
+            alt="preview"
+            className="object-cover rounded"
+            style={{ width: "100%", height: "100%" }}
+          />
         )}
       </div>
+
       <form
         onSubmit={handleFile}
-        className="text-black flex flex-col"
+        className=" flex flex-col bg-gradient-to-t from-zinc-900 via-black-900 to-black-900 rounded p-2"
         method="POST"
       >
-        <input type="file" name="url" id="url" onChange={handleFileChange} />
+        <h1 className="text-xl text-center m-5">CARGA DE IMAGENES</h1>
+        <input
+          className="text-gray-300 "
+          type="file"
+          name="url"
+          id="url"
+          onChange={handleFileChange}
+        />
 
         <label htmlFor="title">titulo</label>
-        <input type="text" name="title" id="title" onChange={handleChange} />
+        <input
+          className="text-black rounded"
+          type="text"
+          name="title"
+          id="title"
+          onChange={handleChange}
+        />
 
         <label htmlFor="history">history</label>
         <input
@@ -101,6 +153,7 @@ export default function Carga() {
           name="history"
           id="history"
           onChange={handleChange}
+          className="text-black rounded"
         />
 
         <label htmlFor="category">category</label>
@@ -109,22 +162,38 @@ export default function Carga() {
           name="category"
           id="category"
           onChange={handleChange}
+          className="text-black"
         />
 
-        <label htmlFor="createdAt">createdAt</label>
+        <label htmlFor="createdAt">fecha</label>
         <input
           type="date"
           name="createdAt"
           id="createdAt"
           onChange={handleChange}
+          className="text-black rounded"
         />
 
         <label htmlFor="active">active</label>
-        <input type="text" name="active" id="active" onChange={handleChange} />
+        <input
+          className="text-black rounded"
+          type="text"
+          name="active"
+          id="active"
+          onChange={handleChange}
+        />
 
-        <button>cargar</button>
+        <button className="text-sm border-b-2 border-gray-400 hover:border-none m-auto flex flex-col justify-center items-center p-1 m-1 rounded-lg  w-24 h-6 ">cargar</button>
       </form>
-
-    </div> 
+      <div
+        className="text-left bg-gradient-to-t from-zinc-900 via-black-900 to-black-900 rounded object-cover  "
+        style={{ width: "300px", height: "400px" }}
+      >
+        <p className="text-white rounded">TITULO: {formImg.title}</p>
+        <p className="text-white rounded">CATEGORIA: {formImg.category}</p>
+        <p className="text-white rounded">HISTORIA: {formImg.history}</p>
+        <p className="text-white rounded">FECHA: {formImg.createdAt}</p>
+      </div>
+    </div>
   );
 }
