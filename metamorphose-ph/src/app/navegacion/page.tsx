@@ -1,7 +1,7 @@
 export default function Navegacion() {
   return (
-    <div className="bg-gray-900 ">
-      <h1>Vista Navegacion</h1>
+    <div className="flex justify-center ">
+      <h1>Podes seleccionar entre las opciones para navegar entre tus fotos, su edicion y su carga </h1>
      
     </div>
   );

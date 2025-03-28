@@ -24,8 +24,6 @@ export const FormLogin: React.FC<FormLoginProps> = ({ setToggle }) => {
   const router = useRouter();
 
   async function postForm(data: Inputs) {
-    console.log(data);
-
     try {
       const response = await fetch(`${PORT}/login`, {
         method: "POST",
@@ -36,14 +34,12 @@ export const FormLogin: React.FC<FormLoginProps> = ({ setToggle }) => {
       });
       if (!response.ok) {
         const errorResponse = await response.text();
-        console.error("Error en la solicitud", errorResponse);
-        throw new Error("Hubo un error en la solicitud");
+        throw new Error("Hubo un error en la solicitud" +errorResponse);
       }
       const dataLogin = await response.json();
-      console.log("login", dataLogin.token);
       localStorage.setItem("token-admin", dataLogin.token);
       setToken({ token: dataLogin.token });
-      toast.success("Login exitoso", {
+      toast.success("Bienvenida", {
         style: {
           borderRadius: "10px",
           background: "#333",
@@ -52,12 +48,27 @@ export const FormLogin: React.FC<FormLoginProps> = ({ setToggle }) => {
           width: "200px",
           backgroundColor: "#6666662f",
           fontFamily:" afacad",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         },
       });
       router.push("/");
     } catch (error) {
-      console.error("Error en el login:", error);
-      alert("Error en el login, vuelve a intentarlo");
+      toast.error("email o contraseñas invalidos, vuelve a intentarlo", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+          height: "50px",
+          width: "300px",
+          backgroundColor: "#6666662f",
+          fontFamily:" afacad",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+      });
     }
   }
 
@@ -97,7 +108,7 @@ export const FormLogin: React.FC<FormLoginProps> = ({ setToggle }) => {
       ) : (
         <p className="text-white text-xs my-2"></p>
       )}
-      <button className="text-white border-gray-600 border-b m-auto w-20 h-6 hover:border-none flex justify-center items-center p-2 m-1 rounded-lg">
+      <button className="text-white border-gray-600 border-b m-auto w-20 h-7 hover:border-none flex justify-center items-center p-2 m-1 rounded-lg">
         sign in
       </button>
       <h3 className="text-xs text-white text-center">
