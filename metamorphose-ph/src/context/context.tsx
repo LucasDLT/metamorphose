@@ -9,10 +9,10 @@ export interface Ifotos {
   id?: number;
   title?: string;
   history?: string;
-  url?: string;
+  url?: File |  null;
   createdAt?: string;
   active?:boolean;
-  category?:ICategory;
+  category?:ICategory | undefined;
 }
 
 export interface ICategory {

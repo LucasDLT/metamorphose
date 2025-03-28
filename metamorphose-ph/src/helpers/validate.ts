@@ -1,5 +1,7 @@
 import { Iuser } from "../types/user.t";
-import { Ierror } from "../types/error.t";
+import { Ierror, IformErrors } from "../types/error.t";
+import { Ifotos } from "@/context/context";
+import { toast } from "sonner";
 
 // Función para validar el formulario
 export const validateForm = (form: Iuser): Ierror => {
@@ -29,4 +31,41 @@ export const validateForm = (form: Iuser): Ierror => {
   }
 
   return errors;
+};
+
+
+
+export const validateCargaImgen = (form:Ifotos):IformErrors => {
+  const errors: IformErrors = {};
+  const tiposPermitidos = ["image/jpeg", "image/png", "image/gif", "image/jpg"];
+
+  if(!form.title) {
+    errors.title = "El nombre de la imagen es obligatorio";
+  }
+
+  if(!form.history) {
+    errors.history = "La historia de la imagen es obligatorio";
+  }
+
+  if(!form.category) {
+    errors.category = "La categoría de la imagen es obligatoria";
+  }
+
+  if(!form.createdAt) {
+    errors.createdAt = "La fecha de carga de la imagen es obligatoria";
+  }
+
+  if(!form.url) {
+    errors.url = "La imagen es obligatoria";
+  }
+
+  if(!form.url?.type || !tiposPermitidos.includes(form.url?.type)) {
+    errors.url = "Formato de imagen no permitido";
+  }
+
+
+
+
+
+  return errors
 };
