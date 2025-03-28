@@ -1,4 +1,5 @@
-import  router  from "../routes/router";
+import router from "../routes/router";
+import { authenticateJWT } from "../middlewares/authMidleware";
 import {
   getCategories,
   postCategory,
