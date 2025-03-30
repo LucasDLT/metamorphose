@@ -1,5 +1,5 @@
 "use client";
-import { useContext } from "react";
+import { useEffect, useContext } from "react";
 import { useState } from "react";
 import { Context, ICategory, Ifotos } from "@/context/context";
 import { toast } from "sonner";
@@ -22,7 +22,10 @@ export default function Carga() {
     active: true,
   });
 
+  useEffect(() => {setError({}) }, [selectCategory]);
+
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    event.preventDefault();
     setFormImg({
       ...formImg,
       [event.target.name]: event.target.value,
@@ -30,6 +33,7 @@ export default function Carga() {
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setFormImg({
@@ -39,6 +43,10 @@ export default function Carga() {
     }
   };
 
+  const handleActiveChange = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setSelectCategory(!selectCategory);
+  };
   const handleCategoryChange = (category: ICategory | null) => {
     setFormImg({
       ...formImg,
@@ -46,7 +54,10 @@ export default function Carga() {
     });
   };
 
-  const handleCategoryInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCategoryInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    event.preventDefault();
     setFormImg({
       ...formImg,
       category: {
@@ -54,7 +65,8 @@ export default function Carga() {
         name: event.target.value,
       },
     });
-  }
+  };
+
   const handleFile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -176,19 +188,34 @@ export default function Carga() {
         {/* bloque selector para la categoria */}
 
         {selectCategory ? (
-  <div>
-    <label htmlFor="category">crear categoria</label>
-    <button onClick={() => setSelectCategory(false)} className="hover:text-gray-500 text-white">seleccionar existente</button>
-    <input
-      type="text"
-      name="category"
-      id="category"
-      onChange={handleCategoryInputChange}
-      className="text-white bg-transparent border-b focus:outline-none"
-    /></div> ) : (<div>    <button onClick={() => setSelectCategory(true)} className="hover:text-gray-500 text-white">crear categoria</button>
-<SelectCategory onChange={handleCategoryChange} />
-  </div>
-)}
+          <div>
+            <label htmlFor="category">crear categoria</label>
+            <button
+              onClick={handleActiveChange}
+              className="hover:text-gray-500 text-white"
+            >
+              seleccionar existente
+            </button>
+            <input
+              type="text"
+              name="category"
+              id="category"
+              onChange={handleCategoryInputChange}
+              className="text-white bg-transparent border-b focus:outline-none"
+            />
+          </div>
+        ) : (
+          <div>
+      
+            <button
+              onClick={() => setSelectCategory(true)}
+              className="hover:text-gray-500 text-white"
+            >
+              crear categoria
+            </button>
+            <SelectCategory onChange={handleCategoryChange} />
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4 ">
           <div className="flex flex-col">
