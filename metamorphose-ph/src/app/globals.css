@@ -37,3 +37,16 @@ body {
 ::-webkit-scrollbar-track {
   background: #ffffff; /* Color de la pista */
 }
+
+
+
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: white;  /* Cambiar el color de fondo */
+  color: #1a1a1a;  /* Cambiar el color del texto */
+  border-radius: 5px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background-color: rgb(68, 68, 68);  /* Cambiar el color de fondo al pasar el mouse */
+  
+}
