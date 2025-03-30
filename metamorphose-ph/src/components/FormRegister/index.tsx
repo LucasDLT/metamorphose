@@ -63,7 +63,7 @@ export const FormRegister:React.FC<IformRegisterProps>=({setToggle})=> {
       method="post"
       className="grid justify-center mx-auto p-4 w-64 bg-gradient-to-t from-zinc-900 to-black-900 rounded-lg"
     >
-      <label className="text-white text-center p-4">REGISTRATE</label>
+      <label className="text-white p-4">REGISTRATE</label>
 
       <label className="text-xs">EMAIL *</label>
       <input

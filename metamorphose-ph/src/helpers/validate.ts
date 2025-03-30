@@ -3,7 +3,7 @@ import { Ierror, IformErrors } from "../types/error.t";
 import { Ifotos } from "@/context/context";
 import { toast } from "sonner";
 
-// Función para validar el formulario
+// Función para validar el formulario login
 export const validateForm = (form: Iuser): Ierror => {
   const errors: Ierror = {};
 
@@ -34,7 +34,7 @@ export const validateForm = (form: Iuser): Ierror => {
 };
 
 
-
+//validacion de la carga de imagenes
 export const validateCargaImgen = (form:Ifotos):IformErrors => {
   const errors: IformErrors = {};
   const tiposPermitidos = ["image/jpeg", "image/png", "image/gif", "image/jpg"];
@@ -62,10 +62,6 @@ export const validateCargaImgen = (form:Ifotos):IformErrors => {
   if(!form.url?.type || !tiposPermitidos.includes(form.url?.type)) {
     errors.url = "Formato de imagen no permitido";
   }
-
-
-
-
 
   return errors
 };

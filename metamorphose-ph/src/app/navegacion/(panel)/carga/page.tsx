@@ -1,20 +1,22 @@
 "use client";
 import { useContext } from "react";
 import { useState } from "react";
-import { Context, Ifotos } from "@/context/context";
+import { Context, ICategory, Ifotos } from "@/context/context";
 import { toast } from "sonner";
 import { IformErrors } from "@/types/error.t";
 import { validateCargaImgen } from "@/helpers/validate";
+import { SelectCategory } from "@/components/selectCategory";
 
 export default function Carga() {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
   const { setFotos, fotos, token } = useContext(Context);
   const [error, setError] = useState<IformErrors>({});
+  const [selectCategory, setSelectCategory] = useState<boolean>(true);
 
   const [formImg, setFormImg] = useState<Ifotos>({
     title: "",
     history: "",
-    category: { id: 0, name: "" },
+    category: null,
     url: null,
     createdAt: "",
     active: true,
@@ -36,6 +38,23 @@ export default function Carga() {
       });
     }
   };
+
+  const handleCategoryChange = (category: ICategory | null) => {
+    setFormImg({
+      ...formImg,
+      category: category,
+    });
+  };
+
+  const handleCategoryInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormImg({
+      ...formImg,
+      category: {
+        id: 0,
+        name: event.target.value,
+      },
+    });
+  }
   const handleFile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -105,22 +124,38 @@ export default function Carga() {
     }
   };
   return (
-    <div className="grid grid-cols-3 gap-20 mt-10">
-      <form
-        onSubmit={handleFile}
-        className=" flex flex-col bg-gradient-to-t from-zinc-900 via-black-900 to-black-900 rounded p-2 font-afacad"
-        method="POST"
-      >
-        <h1 className="text-xl text-center m-5">CARGA DE IMAGENES</h1>
+    <form
+      onSubmit={handleFile}
+      className="grid grid-cols-3 gap-20 rounded font-afacad"
+      method="POST"
+    >
+      {/*bloque para la imagen */}
+      <div className="grid place-items-center">
+        <h1 className="text-xl text-center">CARGA DE IMAGENES</h1>
         <input
-          className="text-gray-300 "
+          className="text-gray-300"
           type="file"
           name="url"
           id="url"
           onChange={handleFileChange}
         />
         {error.url && <p className="text-red-500">{error.url}</p>}
-
+        <div
+          className="rounded object-cover "
+          style={{ width: "300px", height: "400px" }}
+        >
+          {formImg?.url && (
+            <img
+              src={URL.createObjectURL(formImg.url)}
+              alt="preview"
+              className="object-cover rounded"
+              style={{ width: "100%", height: "100%" }}
+            />
+          )}
+        </div>
+      </div>
+      {/*bloque para los datos adicionales */}
+      <div className="flex flex-col mt-8">
         <label htmlFor="title">titulo</label>
         <input
           className="text-white bg-transparent border-b focus:outline-none"
@@ -129,87 +164,94 @@ export default function Carga() {
           id="title"
           onChange={handleChange}
         />
-        {error.title && <p className="text-red-500">{error.title}</p>}
 
-        <label htmlFor="history">history</label>
+        <label htmlFor="history">historia</label>
         <input
           type="text"
           name="history"
           id="history"
           onChange={handleChange}
-          className="text-white bg-transparent border-b focus:outline-none"
+          className="text-white bg-transparent border-b focus:outline-none "
         />
-        {error.history && <p className="text-red-500">{error.history}</p>}
-        <label htmlFor="category">category</label>
-        <input
-          type="text"
-          name="category"
-          id="category"
-          onChange={handleChange}
-          className="text-white bg-transparent border-b focus:outline-none"
-        />
+        {/* bloque selector para la categoria */}
 
-        <label htmlFor="createdAt">fecha</label>
-        <input
-          type="date"
-          name="createdAt"
-          id="createdAt"
-          onChange={handleChange}
-          className="text-white bg-transparent border-b focus:outline-none"
-        />
-        {error.createdAt && <p className="text-red-500">{error.createdAt}</p>}
+        {selectCategory ? (
+  <div>
+    <label htmlFor="category">crear categoria</label>
+    <button onClick={() => setSelectCategory(false)} className="hover:text-gray-500 text-white">seleccionar existente</button>
+    <input
+      type="text"
+      name="category"
+      id="category"
+      onChange={handleCategoryInputChange}
+      className="text-white bg-transparent border-b focus:outline-none"
+    /></div> ) : (<div>    <button onClick={() => setSelectCategory(true)} className="hover:text-gray-500 text-white">crear categoria</button>
+<SelectCategory onChange={handleCategoryChange} />
+  </div>
+)}
 
-        <label htmlFor="active">active</label>
-        <select
-          name="active"
-          id="active"
-          onChange={(e) => {
-            setFormImg({
-              ...formImg,
-              active: e.target.value === "true",
-            });
-          }}
-          value={formImg?.active?.toString()}
-          className="text-white bg-transparent border-b "
-        >
-          <option value="true" className="bg-zinc-900 hover:bg-gray-700">
-            true
-          </option>
-          <option value="false" className="bg-zinc-900 hover:bg-gray-700">
-            false
-          </option>
-        </select>
+        <div className="grid grid-cols-2 gap-4 ">
+          <div className="flex flex-col">
+            <label htmlFor="createdAt">fecha</label>
+            <input
+              type="date"
+              name="createdAt"
+              id="createdAt"
+              onChange={handleChange}
+              className="text-white bg-transparent focus:outline-none"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="active">active</label>
+            <select
+              name="active"
+              id="active"
+              onChange={(e) => {
+                setFormImg({
+                  ...formImg,
+                  active: e.target.value === "true",
+                });
+              }}
+              value={formImg?.active?.toString()}
+              className="text-white bg-transparent focus:outline"
+            >
+              <option value="true" className="bg-zinc-900 hover:bg-gray-700">
+                chi
+              </option>
+              <option value="false" className="bg-zinc-900 hover:bg-gray-700">
+                ño
+              </option>
+            </select>
+          </div>
+        </div>
+        <div className="flex flex-col max-w-xs ">
+          {error.title && <p className="text-red-500 text-xs">{error.title}</p>}
 
-        {error.active && <p className="text-red-500">{error.active}</p>}
+          {error.history && (
+            <p className="text-red-500 text-xs">{error.history}</p>
+          )}
 
-        <button className="text-sm border-b-2 border-gray-400 hover:border-none m-auto flex flex-col justify-center items-center p-1 m-1 rounded-lg  w-24 h-6 ">
-          cargar
-        </button>
-      </form>
+          {error.createdAt && (
+            <p className="text-red-500 text-xs">{error.createdAt}</p>
+          )}
 
-      <div
-        className="text-center bg-gradient-to-t from-zinc-900 via-black-900 to-black-900 rounded object-cover "
-        style={{ width: "300px", height: "400px" }}
-      >
-        {formImg?.url && (
-          <img
-            src={URL.createObjectURL(formImg.url)}
-            alt="preview"
-            className="object-cover rounded"
-            style={{ width: "100%", height: "100%" }}
-          />
-        )}
+          {error.active && (
+            <p className="text-red-500 text-xs">{error.active}</p>
+          )}
+        </div>
       </div>
 
-      {/*  <div
-        className="text-left bg-gradient-to-t from-zinc-900 via-black-900 to-black-900 rounded object-cover  "
-        style={{ width: "300px", height: "400px" }}
-      >
+      <div className=" rounded object-cover  ">
         <p className="text-white rounded">TITULO: {formImg.title}</p>
-        <p className="text-white rounded">CATEGORIA: {formImg.category}</p>
+        <p className="text-white rounded">
+          CATEGORIA: {formImg.category?.name || "no seleccionada"}
+        </p>
         <p className="text-white rounded">HISTORIA: {formImg.history}</p>
         <p className="text-white rounded">FECHA: {formImg.createdAt}</p>
-      </div>*/}
-    </div>
+        <button className="text-sm border-b-2 border-gray-400 hover:border-none m-auto flex flex-col justify-center items-center p-1 m-1 rounded-lg  w-24 h-8 ">
+          cargar
+        </button>
+      </div>
+    </form>
   );
 }

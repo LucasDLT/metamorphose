@@ -9,15 +9,15 @@ export interface Ifotos {
   id?: number;
   title?: string;
   history?: string;
-  url?: File |  null;
+  url?: File | null;
   createdAt?: string;
-  active?:boolean;
-  category?:ICategory | undefined;
+  active?: boolean;
+  category?: ICategory | null | undefined;
 }
 
 export interface ICategory {
-  id:number;
-  name:string;
+  id: number;
+  name: string;
 }
 
 export interface IContextProps {
@@ -25,6 +25,8 @@ export interface IContextProps {
   setToken: (token: Itoken | null) => void;
   fotos: Ifotos[] | [];
   setFotos: (fotos: Ifotos[]) => void;
+  category: ICategory[] | [];
+  setCategory: (category: ICategory[]) => void;
 }
 export const Context = createContext<IContextProps>({} as IContextProps);
 
@@ -38,8 +40,6 @@ export interface Ivalue {
   setFotos: (fotos: Ifotos) => void;
 }
 
-
-
 export const ContextProvider = ({ children }: IContextProvider) => {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
 
@@ -49,8 +49,29 @@ export const ContextProvider = ({ children }: IContextProvider) => {
   });
 
   const [fotos, setFotos] = useState<Ifotos[]>([]);
+  const [category, setCategory] = useState<ICategory[]>([]);
 
-  const value = { token, setToken, fotos, setFotos };
+  const value = { token, setToken, fotos, setFotos, category, setCategory };
+
+  const getCategory = async (token: Itoken) => {
+    if (!token) return;
+    try {
+      const response = await fetch(`${PORT}/categories`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok)
+        throw new Error("Error en la solicitud de categorias en Contexto");
+      const data: ICategory[] = await response.json();
+      console.log("categorias: ", data);
+      data ? setCategory(data) : setCategory([]);
+    } catch (error) {
+      throw new Error("Error al obtener las categorias");
+    }
+  };
 
   async function getPhotos(token: Itoken) {
     if (!token) return;
@@ -63,28 +84,28 @@ export const ContextProvider = ({ children }: IContextProvider) => {
         },
       });
 
-      if (!response.ok) throw new Error("Error en la solicitud");
+      if (!response.ok)
+        throw new Error("Error en la solicitud: Fotos del contexto");
 
       const data: Ifotos[] = await response.json();
       console.log("resultado de fotos", data);
 
       data ? setFotos(data) : setFotos([]);
     } catch (error) {
-      console.error("Error en el get: ", error);
+      throw new Error("Error al obtener las fotos");
     }
   }
 
-
-
   useEffect(() => {
-
-    token && token.token
-      ? localStorage.setItem("token-admin", token.token)        
-      : localStorage.removeItem("token-admin");
-
-    token && token.token 
-      ? getPhotos(token) 
-      : setFotos([]);
+    if (token && token.token) {
+      localStorage.setItem("token-admin", token.token);
+      getPhotos(token) 
+      getCategory(token);
+    } else {
+      localStorage.removeItem("token-admin");
+      setFotos([])
+      setCategory([])
+    }
 
   }, [token]);
 

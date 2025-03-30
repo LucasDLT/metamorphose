@@ -4,8 +4,6 @@ interface CardProps extends Ifotos {
   handleDelete?: () => void;
   handleUpdate?: () => void;
   handleModal?: () => void;
-  url: string;
-  title: string;
 }
 
 export const Card: React.FC<CardProps> = (fotos: CardProps) => {
@@ -20,10 +18,12 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
     handleUpdate,
     handleModal,
   } = fotos;
-  console.log(fotos);
   const newDate = new Date(createdAt!)
     .toLocaleDateString("es-ES")
     .replace(/\//g, "-");
+
+    const imageUrl = url ? (url instanceof File ? URL.createObjectURL(url) : url) : "";
+
 
   return (
     <div className="m-1 flex flex-col items-center rounded font-sans relative z-0 ">
@@ -39,8 +39,8 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
         </h2>
       </div>
       <Image
-        src={url}
-        alt={title}
+        src={imageUrl}
+        alt={title || "Imagen"}
         width={100}
         height={100}
         className="flex justify-center items-center w-full h-52 object-cover rounded hover:opacity-50 transition duration-500 ease-in-out"
