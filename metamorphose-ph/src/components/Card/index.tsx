@@ -1,9 +1,11 @@
-import { Ifotos } from "@/context/context";
+import { Context, Ifotos } from "@/context/context";
+import { useContext } from "react";
 import Image from "next/image";
 interface CardProps extends Ifotos {
   handleDelete?: () => void;
   handleUpdate?: () => void;
   handleModal?: () => void;
+  handleSwap?: () => void;    //dejo esto aca para un selector de botones que se activa con el panel EDICION tengo que hacer dos bloques de divs para que se seleccione entre uno y otro, un boton que la active y le pase a esta funcion un valor booleano para que se muestre el otro. Se ve entre la vista multimedia y la de edicion de ubicacion. 
 }
 
 export const Card: React.FC<CardProps> = (fotos: CardProps) => {
@@ -16,14 +18,15 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
     active,
     handleDelete,
     handleUpdate,
-    handleModal,
+    handleModal 
   } = fotos;
+
   const newDate = new Date(createdAt!)
     .toLocaleDateString("es-ES")
     .replace(/\//g, "-");
 
     const imageUrl = url ? (url instanceof File ? URL.createObjectURL(url) : url) : "";
-
+  const { selected } = useContext(Context)
 
   return (
     <div className="m-1 flex flex-col items-center rounded font-sans relative z-0 ">
@@ -69,6 +72,12 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
         <h1>{title}</h1>
         <h3>{history}</h3>
       </div>
+      {
+        selected && (
+
+          <input type="checkbox" name="" id="" />
+        )
+      }
     </div>
   );
 };
