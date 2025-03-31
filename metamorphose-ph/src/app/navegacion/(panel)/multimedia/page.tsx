@@ -4,19 +4,20 @@ import { useRouter } from "next/navigation";
 import { Context, Ifotos } from "@/context/context";
 import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
+import Image from "next/image";
 
 export default function Multimedia() {
   const { token, fotos, setFotos } = useContext(Context);
   const [localFoto, setLocalFoto] = useState<Ifotos[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedFoto, setSelectedFoto]=useState<Ifotos|null>(null)
+  const [selectedFoto, setSelectedFoto] = useState<Ifotos | null>(null);
 
   const PORT = process.env.NEXT_PUBLIC_API_URL;
 
-  const toggleModal = (foto:Ifotos | null) =>{
-    setSelectedFoto(foto)
+  const toggleModal = (foto: Ifotos | null) => {
+    setSelectedFoto(foto);
     setIsModalOpen(!isModalOpen);
-  } 
+  };
 
   const router = useRouter();
 
@@ -49,11 +50,21 @@ export default function Multimedia() {
     router.push(`multimedia/${id}`);
   };
 
+  const { url, title } = fotos[0] || {};
+
+  const imageUrl = url
+    ? url instanceof File
+    ? URL.createObjectURL(url)
+    : url
+    : "";
+
   return (
     <div className="">
       {token ? (
-        <div className="grid grid-cols-6 overflow-y-scroll gap-1 z-0 h-screen"
-             style={{scrollBehavior:"smooth"}}>
+        <div
+          className="grid grid-cols-6 overflow-y-scroll gap-1 z-0 h-screen"
+          style={{ scrollBehavior: "smooth" }}
+        >
           {Array.isArray(localFoto) && localFoto.length > 0 ? (
             localFoto.map((foto) => (
               <Card
@@ -72,8 +83,14 @@ export default function Multimedia() {
           ) : (
             <h1>No hay fotos en la base de datos</h1>
           )}
-          <Modal isOpen={isModalOpen} onClose={()=>toggleModal(null)}>
-            <img className="w-96 aspect-[9/9] object-cover mt-16" src={selectedFoto?.url} alt={selectedFoto?.title} />
+          <Modal isOpen={isModalOpen} onClose={() => toggleModal(null)}>
+            <Image
+              className="w-96 aspect-[9/9] object-cover mt-16"
+              src={imageUrl}
+              alt={title || "Imagen"}
+              width={500}
+              height={500}
+            />
           </Modal>
         </div>
       ) : (
