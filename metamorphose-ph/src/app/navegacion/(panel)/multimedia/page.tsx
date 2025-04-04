@@ -11,8 +11,69 @@ export default function Multimedia() {
   const [localFoto, setLocalFoto] = useState<Ifotos[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedFoto, setSelectedFoto] = useState<Ifotos | null>(null);
+  const [idSelected, setIdSelected] = useState<number[]>([]);
+  {
+    /*este estado es para guardar los id de las fotos seleccionadas TIENEN QUE SER DOS voy a ocultar el boton para el cambio hasta que sean DOS si se pasa se saca del DOM*/
+  }
+  const idslength = idSelected?.length;
+
+  {
+    /*este es para saber la longitud de los ids y controlar si son 2 o mas o menos*/
+  }
 
   const PORT = process.env.NEXT_PUBLIC_API_URL;
+
+  const handleCheckboxChange = (fotoId: number, checked: boolean) => {
+    // Si el checkbox está marcado
+    if (checked) {
+      // Actualizamos el estado agregando la id de la foto al array
+      setIdSelected((prevIds) => {
+        const newIds = [...prevIds, fotoId];
+        console.log(newIds); // Aquí puedes ver el nuevo valor de idSelected después de actualizar
+        return newIds;
+      });
+    } else {
+      // Si el checkbox está desmarcado, eliminamos la id de la foto del array
+      setIdSelected((prevIds) => {
+        const newIds = prevIds.filter((id) => id !== fotoId);
+        console.log(newIds); // Aquí puedes ver el nuevo valor de idSelected después de actualizar
+        return newIds;
+      });
+    }
+  };
+
+  const handlePutIds = async (ids: number[]) => {
+    if (ids.length !== 2) {
+      // verifico que llegue algo
+      alert("no se recibieron ids en handlePutIds");
+      return;
+    }
+    const idsObjet = {
+      id1: Number(ids[0]),
+      id2: Number(ids[1]),
+      //aca creo un objeto acorde lo que recibe el backend
+    };
+
+    console.log(idsObjet);
+
+    try {
+      const response = await fetch(`${PORT}/photos/updateorderglobal`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token?.token}`,
+          "Content-Type": "application/json",
+        },
+        body: idsObjet ? JSON.stringify(idsObjet) : null,
+      });
+      const data = await response.json();
+      console.log(data);
+      if (data.photos) {
+        setFotos(data.photos);
+      }
+    } catch (error) {
+      throw new Error("Error al obtener las fotos");
+    }
+  };
 
   const toggleModal = (foto: Ifotos | null) => {
     setSelectedFoto(foto);
@@ -41,6 +102,7 @@ export default function Multimedia() {
       if (data.photos) {
         setFotos(data.photos);
       }
+      console.log(data.photos);
     } catch (error) {
       console.error(error);
     }
@@ -54,8 +116,8 @@ export default function Multimedia() {
 
   const imageUrl = url
     ? url instanceof File
-    ? URL.createObjectURL(url)
-    : url
+      ? URL.createObjectURL(url)
+      : url
     : "";
 
   return (
@@ -66,7 +128,9 @@ export default function Multimedia() {
           style={{ scrollBehavior: "smooth" }}
         >
           {Array.isArray(localFoto) && localFoto.length > 0 ? (
-            localFoto.map((foto) => (
+            localFoto
+            .sort((a, b) => a.globalOrder! - b.globalOrder!)
+            .map((foto) => (
               <Card
                 key={foto.id}
                 url={foto.url!}
@@ -78,6 +142,9 @@ export default function Multimedia() {
                 handleDelete={() => handleDelete(foto.id as number)}
                 handleUpdate={() => handleUpdate(foto.id as number)}
                 handleModal={() => toggleModal(foto)}
+                handleChecked={(e) =>
+                handleCheckboxChange(foto.id as number, e.target.checked)
+                }
               />
             ))
           ) : (
@@ -95,6 +162,11 @@ export default function Multimedia() {
         </div>
       ) : (
         <h1>No te encontras registrado</h1>
+      )}
+      {idslength === 2 && (
+        <button onClick={() => handlePutIds(idSelected)}>
+          realizar cambio
+        </button>
       )}
     </div>
   );
