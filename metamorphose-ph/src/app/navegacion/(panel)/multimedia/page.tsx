@@ -7,7 +7,7 @@ import { Modal } from "@/components/Modal";
 import Image from "next/image";
 
 export default function Multimedia() {
-  const { token, fotos, setFotos } = useContext(Context);
+  const { token, fotos, setFotos, loading, error } = useContext(Context);
   const [localFoto, setLocalFoto] = useState<Ifotos[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedFoto, setSelectedFoto] = useState<Ifotos | null>(null);
@@ -27,18 +27,11 @@ export default function Multimedia() {
     // Si el checkbox está marcado
     if (checked) {
       // Actualizamos el estado agregando la id de la foto al array
-      setIdSelected((prevIds) => {
-        const newIds = [...prevIds, fotoId];
-        console.log(newIds); // Aquí puedes ver el nuevo valor de idSelected después de actualizar
-        return newIds;
-      });
+      setIdSelected((prevIds) => [...prevIds, fotoId]);
     } else {
       // Si el checkbox está desmarcado, eliminamos la id de la foto del array
-      setIdSelected((prevIds) => {
-        const newIds = prevIds.filter((id) => id !== fotoId);
-        console.log(newIds); // Aquí puedes ver el nuevo valor de idSelected después de actualizar
-        return newIds;
-      });
+      setIdSelected((prevIds) => prevIds.filter((id) => id !== fotoId));
+
     }
   };
 
@@ -49,8 +42,8 @@ export default function Multimedia() {
       return;
     }
     const idsObjet = {
-      id1: Number(ids[0]),
-      id2: Number(ids[1]),
+      id1: ids[0],
+      id2: ids[1],
       //aca creo un objeto acorde lo que recibe el backend
     };
 
@@ -65,12 +58,19 @@ export default function Multimedia() {
         },
         body: idsObjet ? JSON.stringify(idsObjet) : null,
       });
+      if (!response.ok) {
+        throw new Error("Error al intercambiar fotos");
+      }
       const data = await response.json();
-      console.log(data);
+      console.log("Respuesta del servidor:", data);
       if (data.photos) {
         setFotos(data.photos);
+        setIdSelected([]);
+        console.log("idSelected", idSelected);
+        
       }
     } catch (error) {
+      console.error("Error al intercambiar fotos:", error);
       throw new Error("Error al obtener las fotos");
     }
   };
@@ -82,12 +82,19 @@ export default function Multimedia() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    setLocalFoto(fotos);
-  }, [fotos]);
+
 
   const handleDelete = async (id: number) => {
     console.log("click en delete ", id);
+
+    // Si estamos cargando las fotos o hay un error
+    if (loading) {
+      return <div>Cargando fotos...</div>;
+    }
+
+    if (error) {
+      return <div>{error}</div>;
+    }
 
     try {
       const response = await fetch(`${PORT}/photos/${id}`, {
@@ -120,6 +127,10 @@ export default function Multimedia() {
       : url
     : "";
 
+    useEffect(() => {
+      if (token && token.token) setLocalFoto(fotos);
+    }, [fotos, token]);
+
   return (
     <div className="">
       {token ? (
@@ -129,24 +140,26 @@ export default function Multimedia() {
         >
           {Array.isArray(localFoto) && localFoto.length > 0 ? (
             localFoto
-            .sort((a, b) => a.globalOrder! - b.globalOrder!)
-            .map((foto) => (
-              <Card
-                key={foto.id}
-                url={foto.url!}
-                title={foto.title!}
-                history={foto.history}
-                category={foto.category}
-                createdAt={foto.createdAt}
-                active={foto.active}
-                handleDelete={() => handleDelete(foto.id as number)}
-                handleUpdate={() => handleUpdate(foto.id as number)}
-                handleModal={() => toggleModal(foto)}
-                handleChecked={(e) =>
-                handleCheckboxChange(foto.id as number, e.target.checked)
-                }
-              />
-            ))
+              .sort((a, b) => (b.globalOrder || 0) - (a.globalOrder || 0))
+              .map((foto) => (
+                <Card
+                  key={foto.id}
+                  url={foto.url!}
+                  title={foto.title!}
+                  history={foto.history}
+                  category={foto.category}
+                  createdAt={foto.createdAt}
+                  active={foto.active}
+                  handleDelete={() => handleDelete(foto.id as number)}
+                  handleUpdate={() => handleUpdate(foto.id as number)}
+                  handleModal={() => toggleModal(foto)}
+                  checked={idSelected.includes(foto.id as number)}
+                  handleChecked={(e) =>
+                    handleCheckboxChange(foto.id as number, e.target.checked)
+
+                  }
+                />
+              ))
           ) : (
             <h1>No hay fotos en la base de datos</h1>
           )}
