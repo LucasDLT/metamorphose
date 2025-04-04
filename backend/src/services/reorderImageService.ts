@@ -30,7 +30,12 @@ export const swapGlobalOrder = async (id1:number, id2:number):Promise<Image[]>=>
     const tempOrder = image1.globalOrder;
     image1.globalOrder = image2.globalOrder;
     image2.globalOrder = tempOrder
-    await imageRepository.save([image1, image2])
 
-    return imageRepository.find()
+    await imageRepository.save([image1, image2])
+    
+    const allImages = await imageRepository.find()
+    const sortedImagenes = allImages.sort((a,b)=>a.globalOrder - b.globalOrder)
+    
+
+    return sortedImagenes 
 }
