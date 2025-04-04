@@ -5,8 +5,8 @@ interface CardProps extends Ifotos {
   handleDelete?: () => void;
   handleUpdate?: () => void;
   handleModal?: () => void;
-  handleSwap?: () => void; //dejo esto aca para un selector de botones que se activa con el panel EDICION tengo que hacer dos bloques de divs para que se seleccione entre uno y otro, un boton que la active y le pase a esta funcion un valor booleano para que se muestre el otro. Se ve entre la vista multimedia y la de edicion de ubicacion.
-  
+  handleChecked?: (e: React.ChangeEvent<HTMLInputElement>) => void; //dejo esto aca para un selector de botones que se activa con el panel EDICION tengo que hacer dos bloques de divs para que se seleccione entre uno y otro, un boton que la active y le pase a esta funcion un valor booleano para que se muestre el otro. Se ve entre la vista multimedia y la de edicion de ubicacion.
+
 }
 
 export const Card: React.FC<CardProps> = (fotos: CardProps) => {
@@ -17,9 +17,12 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
     category,
     createdAt,
     active,
+    globalOrder,
+    categoryOrder,
     handleDelete,
     handleUpdate,
     handleModal,
+    handleChecked
   } = fotos;
 
   const newDate = new Date(createdAt!)
@@ -83,7 +86,13 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
           <h3>{history}</h3>
         </div>
       )}
-      {selected && <input type="checkbox" name="swap" id="swap" className="" />}
+      {selected && 
+      <input
+       type="checkbox" 
+       name="swap" 
+       id="swap"
+       onChange={handleChecked} 
+       />}
     </div>
   );
 };
