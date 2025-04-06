@@ -213,8 +213,7 @@ export default function Carga() {
             >
               crear categoria
             </button>
-            <SelectCategory onChange={handleCategoryChange} />
-          </div>
+            <SelectCategory onChange={handleCategoryChange} style={{ color: 'gray', backgroundColor: 'transparent', outline: 'none' }} />          </div>
         )}
 
         <div className="grid grid-cols-2 gap-4 ">

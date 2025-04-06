@@ -1,77 +1,80 @@
 "use client";
 import { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Context, Ifotos } from "@/context/context";
+import { Context, ICategory, Ifotos } from "@/context/context";
 import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import Image from "next/image";
+import { SelectCategory } from "@/components/selectCategory";
 
 export default function Multimedia() {
-  const { token, fotos, setFotos } = useContext(Context);
-  const [localFoto, setLocalFoto] = useState<Ifotos[]>([]);
+  const { token, fotos, setFotos, loading, error, category } = useContext(Context);
+  const [localFoto, setLocalFoto] = useState<Ifotos[]>([]);  // Fotos por categoría
+  const [globalFotos, setGlobalFotos] = useState<Ifotos[]>([]); // Fotos globales
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedFoto, setSelectedFoto] = useState<Ifotos | null>(null);
   const [idSelected, setIdSelected] = useState<number[]>([]);
-  {
-    /*este estado es para guardar los id de las fotos seleccionadas TIENEN QUE SER DOS voy a ocultar el boton para el cambio hasta que sean DOS si se pasa se saca del DOM*/
-  }
+  const [selectCategory, setSelectCategory] = useState<ICategory | null>(null);
+
   const idslength = idSelected?.length;
-
-  {
-    /*este es para saber la longitud de los ids y controlar si son 2 o mas o menos*/
-  }
-
   const PORT = process.env.NEXT_PUBLIC_API_URL;
 
   const handleCheckboxChange = (fotoId: number, checked: boolean) => {
-    // Si el checkbox está marcado
     if (checked) {
-      // Actualizamos el estado agregando la id de la foto al array
-      setIdSelected((prevIds) => {
-        const newIds = [...prevIds, fotoId];
-        console.log(newIds); // Aquí puedes ver el nuevo valor de idSelected después de actualizar
-        return newIds;
-      });
+      setIdSelected((prevIds) => [...prevIds, fotoId]);
     } else {
-      // Si el checkbox está desmarcado, eliminamos la id de la foto del array
-      setIdSelected((prevIds) => {
-        const newIds = prevIds.filter((id) => id !== fotoId);
-        console.log(newIds); // Aquí puedes ver el nuevo valor de idSelected después de actualizar
-        return newIds;
-      });
+      setIdSelected((prevIds) => prevIds.filter((id) => id !== fotoId));
     }
+  };
+
+  
+  const handleCategoryChange = (category: ICategory | null) => {
+    setSelectCategory(category || null);
+    setLocalFoto([])
   };
 
   const handlePutIds = async (ids: number[]) => {
     if (ids.length !== 2) {
-      // verifico que llegue algo
       alert("no se recibieron ids en handlePutIds");
       return;
     }
     const idsObjet = {
-      id1: Number(ids[0]),
-      id2: Number(ids[1]),
-      //aca creo un objeto acorde lo que recibe el backend
+      id1: ids[0],
+      id2: ids[1],
     };
 
-    console.log(idsObjet);
-
     try {
-      const response = await fetch(`${PORT}/photos/updateorderglobal`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token?.token}`,
-          "Content-Type": "application/json",
-        },
-        body: idsObjet ? JSON.stringify(idsObjet) : null,
-      });
+      let response;
+      if (selectCategory) {
+        response = await fetch(`${PORT}/photos/updateorder`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token?.token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(idsObjet),
+        });
+      } else {
+        response = await fetch(`${PORT}/photos/updateorderglobal`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token?.token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(idsObjet),
+        });
+      }
+
+      if (!response.ok) {
+        throw new Error("Error al intercambiar fotos");
+      }
       const data = await response.json();
-      console.log(data);
       if (data.photos) {
         setFotos(data.photos);
+        setIdSelected([]);
       }
     } catch (error) {
-      throw new Error("Error al obtener las fotos");
+      console.error("Error al intercambiar fotos:", error);
     }
   };
 
@@ -82,12 +85,9 @@ export default function Multimedia() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    setLocalFoto(fotos);
-  }, [fotos]);
-
   const handleDelete = async (id: number) => {
-    console.log("click en delete ", id);
+    if (loading) return <div>Cargando fotos...</div>;
+    if (error) return <div>{error}</div>;
 
     try {
       const response = await fetch(`${PORT}/photos/${id}`, {
@@ -98,11 +98,9 @@ export default function Multimedia() {
         },
       });
       const data = await response.json();
-      console.log(data);
       if (data.photos) {
         setFotos(data.photos);
       }
-      console.log(data.photos);
     } catch (error) {
       console.error(error);
     }
@@ -113,24 +111,41 @@ export default function Multimedia() {
   };
 
   const { url, title } = fotos[0] || {};
-
   const imageUrl = url
     ? url instanceof File
       ? URL.createObjectURL(url)
       : url
     : "";
 
+  // Actualiza los estados de fotos por categoría y fotos globales
+  useEffect(() => {
+    if (token && token.token) {
+      if (selectCategory) {
+        const filteredFotos = fotos.filter((foto) => foto.category?.id === selectCategory.id);
+        // Si hay una categoría seleccionada, usa las fotos de esa categoría
+        setLocalFoto(
+          filteredFotos.sort((a, b) => (a.categoryOrder || 0) - (b.categoryOrder || 0))
+        );
+      } else {
+        // Si no hay categoría seleccionada, usa todas las fotos y ordena globalmente
+        setGlobalFotos(
+          fotos.sort((a, b) => (a.globalOrder || 0) - (b.globalOrder || 0))
+        );
+      }
+    }
+  }, [fotos, token, selectCategory]);
+
   return (
-    <div className="">
+    <div className=" w-full h-full bg-gradient-to-b from-zinc-900 to-black-900">
+      <SelectCategory onChange={handleCategoryChange} style={{ background:"transparent", color:"white", width:"20%", height:"5%", border:"none", }}/>
       {token ? (
         <div
-          className="grid grid-cols-6 overflow-y-scroll gap-1 z-0 h-screen"
+          className="grid grid-cols-3 overflow-y-scroll z-0 h-screen"
           style={{ scrollBehavior: "smooth" }}
         >
-          {Array.isArray(localFoto) && localFoto.length > 0 ? (
-            localFoto
-            .sort((a, b) => a.globalOrder! - b.globalOrder!)
-            .map((foto) => (
+          {/* Muestra las fotos de la categoría seleccionada o las fotos globales */}
+          {selectCategory ? (
+            localFoto.map((foto) => (
               <Card
                 key={foto.id}
                 url={foto.url!}
@@ -142,13 +157,31 @@ export default function Multimedia() {
                 handleDelete={() => handleDelete(foto.id as number)}
                 handleUpdate={() => handleUpdate(foto.id as number)}
                 handleModal={() => toggleModal(foto)}
+                checked={idSelected.includes(foto.id as number)}
                 handleChecked={(e) =>
-                handleCheckboxChange(foto.id as number, e.target.checked)
+                  handleCheckboxChange(foto.id as number, e.target.checked)
                 }
               />
             ))
           ) : (
-            <h1>No hay fotos en la base de datos</h1>
+            globalFotos.map((foto) => (
+              <Card
+                key={foto.id}
+                url={foto.url!}
+                title={foto.title!}
+                history={foto.history}
+                category={foto.category}
+                createdAt={foto.createdAt}
+                active={foto.active}
+                handleDelete={() => handleDelete(foto.id as number)}
+                handleUpdate={() => handleUpdate(foto.id as number)}
+                handleModal={() => toggleModal(foto)}
+                checked={idSelected.includes(foto.id as number)}
+                handleChecked={(e) =>
+                  handleCheckboxChange(foto.id as number, e.target.checked)
+                }
+              />
+            ))
           )}
           <Modal isOpen={isModalOpen} onClose={() => toggleModal(null)}>
             <Image
@@ -164,7 +197,7 @@ export default function Multimedia() {
         <h1>No te encontras registrado</h1>
       )}
       {idslength === 2 && (
-        <button onClick={() => handlePutIds(idSelected)}>
+        <button onClick={() => handlePutIds(idSelected)} className="absolute top-1 right-4  transform hover:translate-x-[-10%] transition duration-500 ease-in-out text-gray-400 font-afacad">
           realizar cambio
         </button>
       )}

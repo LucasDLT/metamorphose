@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, createContext, ReactNode } from "react";
+import { set } from "zod";
 
 export interface Itoken {
   token?: string | null;
@@ -20,6 +21,7 @@ export interface Ifotos {
 export interface ICategory {
   id: number;
   name: string;
+  images?: Ifotos[];
 }
 
 export interface IContextProps {
@@ -31,6 +33,8 @@ export interface IContextProps {
   setCategory: (category: ICategory[]) => void;
   selected: boolean | null;
   setSelected: (selected: boolean) => void;
+  loading: boolean;
+  error: string | null;
 }
 export const Context = createContext<IContextProps>({} as IContextProps);
 
@@ -55,13 +59,14 @@ export const ContextProvider = ({ children }: IContextProvider) => {
     const storageToken = localStorage.getItem("token-admin");
     return storageToken ? { token: storageToken } : null;
   });
-
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<boolean>(false);
 
   const [fotos, setFotos] = useState<Ifotos[]>([]);
   const [category, setCategory] = useState<ICategory[]>([]);
 
-  const value = { token, setToken, fotos, setFotos, category, setCategory, selected, setSelected };
+  const value = { token, setToken, fotos, setFotos, category, setCategory, selected, setSelected, loading, error };
 
   const getCategory = async (token: Itoken) => {
     if (!token) return;
@@ -85,6 +90,8 @@ export const ContextProvider = ({ children }: IContextProvider) => {
 
   async function getPhotos(token: Itoken) {
     if (!token) return;
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`${PORT}/photos`, {
         method: "GET",
@@ -102,8 +109,12 @@ export const ContextProvider = ({ children }: IContextProvider) => {
 
       data ? setFotos(data) : setFotos([]);
     } catch (error) {
+      setError( "Ocurrio un error al obtener las fotos");
       throw new Error("Error al obtener las fotos");
     }
+    finally{
+      setLoading(false);
+  } 
   }
 
   useEffect(() => {
