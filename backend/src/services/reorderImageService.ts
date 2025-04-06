@@ -15,7 +15,10 @@ export const swapCategoryOrder = async (id1: number, id2:number):Promise<Image[]
 
     await imageRepository.save([image1, image2])
 
-    return[image1, image2]
+    const allImages = await imageRepository.find()
+    const sortedImagenes = allImages.sort((a,b)=>a.categoryOrder - b.categoryOrder)
+
+    return sortedImagenes
 }
 
 export const swapGlobalOrder = async (id1:number, id2:number):Promise<Image[]>=>{
