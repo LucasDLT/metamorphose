@@ -45,7 +45,17 @@ export default function Carga() {
 
   const handleActiveChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    setSelectCategory(!selectCategory);
+    if (selectCategory) {
+      setFormImg({
+        ...formImg,
+        category: {
+          id: 0,
+          name: "",},
+        })
+        setSelectCategory(!selectCategory);
+    }
+
+
   };
   const handleCategoryChange = (category: ICategory | null) => {
     setFormImg({
@@ -130,6 +140,7 @@ export default function Carga() {
         createdAt: "",
         active: true,
       });
+      setError({});
     } catch (error) {
       toast.error("Error al cargar la imagen", { duration: 5000 });
       throw new Error("error en el post de imagenes" + error);
@@ -138,7 +149,7 @@ export default function Carga() {
   return (
     <form
       onSubmit={handleFile}
-      className="grid grid-cols-3 gap-20 rounded font-afacad"
+      className="flex flex-row gap-4 rounded font-afacad border w-full p-4 justify-between items-center"
       method="POST"
     >
       {/*bloque para la imagen */}
@@ -167,7 +178,7 @@ export default function Carga() {
         </div>
       </div>
       {/*bloque para los datos adicionales */}
-      <div className="flex flex-col mt-8">
+      <div className=" border rounded flex flex-col p-4 gap-2 h-[300px] justify-evenly items-center">
         <label htmlFor="title">titulo</label>
         <input
           className="text-white bg-transparent border-b focus:outline-none"
@@ -175,6 +186,7 @@ export default function Carga() {
           name="title"
           id="title"
           onChange={handleChange}
+          value={formImg.title}
         />
 
         <label htmlFor="history">historia</label>
@@ -183,6 +195,7 @@ export default function Carga() {
           name="history"
           id="history"
           onChange={handleChange}
+          value={formImg.history}
           className="text-white bg-transparent border-b focus:outline-none "
         />
         {/* bloque selector para la categoria */}
@@ -201,6 +214,7 @@ export default function Carga() {
               name="category"
               id="category"
               onChange={handleCategoryInputChange}
+              value={formImg.category?.name || ""}
               className="text-white bg-transparent border-b focus:outline-none"
             />
           </div>
@@ -213,7 +227,7 @@ export default function Carga() {
             >
               crear categoria
             </button>
-            <SelectCategory onChange={handleCategoryChange} style={{ color: 'gray', backgroundColor: 'transparent', outline: 'none' }} />          </div>
+            <SelectCategory onChange={handleCategoryChange} value={formImg.category?.name || ""} style={{ color: 'gray', backgroundColor: 'transparent', outline: 'none' }} />          </div>
         )}
 
         <div className="grid grid-cols-2 gap-4 ">
@@ -225,6 +239,7 @@ export default function Carga() {
               id="createdAt"
               onChange={handleChange}
               className="text-white bg-transparent focus:outline-none"
+              value={formImg.createdAt}
             />
           </div>
           <div className="flex flex-col">
@@ -265,18 +280,19 @@ export default function Carga() {
             <p className="text-red-500 text-xs">{error.active}</p>
           )}
         </div>
+      <button className="text-sm border-b-2 border-gray-400 hover:border-none flex flex-col justify-center items-center rounded-lg  w-24 h-8 ">
+        cargar
+      </button>
       </div>
 
-      <div className=" rounded object-cover  ">
+      <div className="
+      border rounded flex flex-col p-4 gap-2 h-[300px] justify-evenly ">
         <p className="text-white rounded">TITULO: {formImg.title}</p>
         <p className="text-white rounded">
           CATEGORIA: {formImg.category?.name || "no seleccionada"}
         </p>
         <p className="text-white rounded">HISTORIA: {formImg.history}</p>
         <p className="text-white rounded">FECHA: {formImg.createdAt}</p>
-        <button className="text-sm border-b-2 border-gray-400 hover:border-none m-auto flex flex-col justify-center items-center p-1 m-1 rounded-lg  w-24 h-8 ">
-          cargar
-        </button>
       </div>
     </form>
   );

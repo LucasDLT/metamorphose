@@ -4,6 +4,7 @@ import { Context, ICategory } from "@/context/context";
 interface IselectCategoryProps {
   onChange: (selectedCategory: ICategory | null) => void;
   style?: React.CSSProperties;
+  value?: string | null;
 }
 
 export const SelectCategory: React.FC<IselectCategoryProps> = ({
