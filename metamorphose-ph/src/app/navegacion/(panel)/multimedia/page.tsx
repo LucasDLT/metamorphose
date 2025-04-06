@@ -110,7 +110,7 @@ export default function Multimedia() {
     router.push(`multimedia/${id}`);
   };
 
-  const { url, title } = fotos[0] || {};
+  const { url, title } = selectedFoto || {};
   const imageUrl = url
     ? url instanceof File
       ? URL.createObjectURL(url)
@@ -136,12 +136,15 @@ export default function Multimedia() {
   }, [fotos, token, selectCategory]);
 
   return (
-    <div className=" w-full h-full bg-gradient-to-b from-zinc-900 to-black-900">
-      <SelectCategory onChange={handleCategoryChange} style={{ background:"transparent", color:"white", width:"20%", height:"5%", border:"none", }}/>
+    <div className="">
+      <SelectCategory onChange={handleCategoryChange} style={{ background:"transparent", color:"white", width:"13%", height:"5%", border:"none", padding:"1px", margin:"4px", position:"absolute", top:"10", left:"0", zIndex:"60" }}/>
       {token ? (
         <div
-          className="grid grid-cols-3 overflow-y-scroll z-0 h-screen"
-          style={{ scrollBehavior: "smooth" }}
+          className="grid grid-cols-3 , mt-10 font-afacad"
+          style={{ scrollBehavior: "smooth",
+            maxHeight: "calc(90vh - 200px)",
+            overflowY: "auto",
+           }}
         >
           {/* Muestra las fotos de la categoría seleccionada o las fotos globales */}
           {selectCategory ? (
@@ -156,7 +159,7 @@ export default function Multimedia() {
                 active={foto.active}
                 handleDelete={() => handleDelete(foto.id as number)}
                 handleUpdate={() => handleUpdate(foto.id as number)}
-                handleModal={() => toggleModal(foto)}
+                handleModal={() => toggleModal(foto as Ifotos)}
                 checked={idSelected.includes(foto.id as number)}
                 handleChecked={(e) =>
                   handleCheckboxChange(foto.id as number, e.target.checked)
@@ -175,7 +178,7 @@ export default function Multimedia() {
                 active={foto.active}
                 handleDelete={() => handleDelete(foto.id as number)}
                 handleUpdate={() => handleUpdate(foto.id as number)}
-                handleModal={() => toggleModal(foto)}
+                handleModal={() => toggleModal(foto as Ifotos)}
                 checked={idSelected.includes(foto.id as number)}
                 handleChecked={(e) =>
                   handleCheckboxChange(foto.id as number, e.target.checked)
@@ -185,7 +188,7 @@ export default function Multimedia() {
           )}
           <Modal isOpen={isModalOpen} onClose={() => toggleModal(null)}>
             <Image
-              className="w-96 aspect-[9/9] object-cover mt-16"
+              className="w-full aspect-[1/1] object-cover mt-16 rounded"
               src={imageUrl}
               alt={title || "Imagen"}
               width={500}
@@ -197,8 +200,8 @@ export default function Multimedia() {
         <h1>No te encontras registrado</h1>
       )}
       {idslength === 2 && (
-        <button onClick={() => handlePutIds(idSelected)} className="absolute top-1 right-4  transform hover:translate-x-[-10%] transition duration-500 ease-in-out text-gray-400 font-afacad">
-          realizar cambio
+        <button onClick={() => handlePutIds(idSelected)} className=" absolute top-0  right-2  transform hover:scale-110 transition duration-500 ease-in-out font-afacad fixed z-60 p-2">
+          REORDENAR
         </button>
       )}
     </div>

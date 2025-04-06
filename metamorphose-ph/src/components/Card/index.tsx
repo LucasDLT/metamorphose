@@ -48,9 +48,9 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
     }
   };
   return (
-    <div className="m-1 flex flex-col items-center justify-center rounded font-sans relative z-0">
+    <div className="aspect-[5/4] h-100 w-100 m-1 flex flex-col items-center justify-center rounded font-sans relative z-0 ">
       {!selected && (
-        <div className="flex flex-row justify-between  text-xs w-full bg-black bg-opacity-80 z-10 font-afacad absolute top-[34px] ">
+        <div className="flex flex-row justify-between  text-xs w-full bg-black bg-opacity-80 z-10 font-afacad absolute top-0  ">
           <h2 className="text-gray-300 hover:text-gray-500 uppercase flex alingn-center transition duration-500 ease-in-out">
             {category?.name} 
           </h2>
@@ -66,11 +66,11 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
         src={imageUrl}
         alt={title || "Imagen"}
         width={500}
-        height={500}
-        className="flex justify-center items-center w-full h-72 object-cover hover:opacity-50 transition duration-500 ease-in-out"
+        height={333}
+        className="flex justify-center items-center w-full h-full object-cover hover:opacity-50 transition duration-500 ease-in-out"
       />
       {!selected && (
-        <div className="flex flex-row justify-between text-xs w-full bg-black bg-opacity-80 z-10 font-afacad absolute bottom-[34px] ">
+        <div className="flex flex-row justify-between text-xs w-full bg-black bg-opacity-80 z-10 font-afacad absolute bottom-[0px] ">
           <button
             className="text-gray-300 hover:text-gray-500 transition duration-500 ease-in-out"
             onClick={handleModal}
@@ -104,7 +104,7 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
        id="swap"
        checked={checked}
        onChange={handleChecked} 
-       className="absolute top-10 left-1"
+       className="absolute top-1 left-1 "
        />}
     </div>
   );
