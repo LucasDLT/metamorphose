@@ -21,6 +21,7 @@ export interface Ifotos {
 export interface ICategory {
   id: number;
   name: string;
+  images?: Ifotos[];
 }
 
 export interface IContextProps {
