@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { Context } from "@/context/context";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 
 interface FormLoginProps {
   setToggle: React.Dispatch<React.SetStateAction<boolean>>;
@@ -75,9 +75,9 @@ export const FormLogin: React.FC<FormLoginProps> = ({ setToggle }) => {
   return (
     <form
       onSubmit={handleSubmit(postForm)}
-      className="grid justify-center mx-auto p-4 w-64 bg-gradient-to-t from-zinc-900 to-black-900 rounded-lg"
+      className="grid justify-center mx-auto p-4 w-64 bg-gradient-to-t from-black/80 to-black/10 backdrop-blur-sm rounded-b"
     >
-      <label className="text-white text-center m-6">LOGIN</label>
+      <label className="text-white  text-center m-6">LOGIN</label>
 
       <label className="text-white text-xs" htmlFor="email">
         EMAIL *

@@ -24,17 +24,20 @@ export interface ICategory {
   images?: Ifotos[];
 }
 
+
 export interface IContextProps {
   token: Itoken | null;
   setToken: (token: Itoken | null) => void;
   fotos: Ifotos[] | [];
   setFotos: (fotos: Ifotos[]) => void;
   category: ICategory[] | [];
-  setCategory: (category: ICategory[]) => void;
+  setCategory: (category: ICategory[] | ((prevCategories: ICategory[]) => ICategory[])) => void;
   selected: boolean | null;
   setSelected: (selected: boolean) => void;
   loading: boolean;
   error: string | null;
+  selectedCategory: ICategory | null;
+  setSelectedCategory: (category: ICategory | null) => void;
 }
 export const Context = createContext<IContextProps>({} as IContextProps);
 
@@ -50,6 +53,8 @@ export interface Ivalue {
   setCategory: (category: ICategory[]) => void;
   selected: boolean;
   setSelected: (selected: boolean) => void;
+  setSelectedCategory: (category: ICategory | null) => void;
+  selectedCategory: ICategory | null;
 }
 
 export const ContextProvider = ({ children }: IContextProvider) => {
@@ -65,8 +70,9 @@ export const ContextProvider = ({ children }: IContextProvider) => {
 
   const [fotos, setFotos] = useState<Ifotos[]>([]);
   const [category, setCategory] = useState<ICategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
 
-  const value = { token, setToken, fotos, setFotos, category, setCategory, selected, setSelected, loading, error };
+  const value = { token, setToken, fotos, setFotos, category, setCategory, selected, setSelected, loading, error, setSelectedCategory, selectedCategory };
 
   const getCategory = async (token: Itoken) => {
     if (!token) return;
