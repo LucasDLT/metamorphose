@@ -67,7 +67,7 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
         alt={title || "Imagen"}
         width={500}
         height={333}
-        className="flex justify-center items-center w-full h-full object-cover hover:opacity-50 transition duration-500 ease-in-out"
+        className="flex justify-center items-center w-full h-full object-cover hover:opacity-80  transition duration-500 ease-in-out"
       />
       {!selected && (
         <div className="flex flex-row justify-between text-xs w-full bg-black bg-opacity-80 z-10 font-afacad absolute bottom-[0px] ">

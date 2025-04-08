@@ -13,15 +13,21 @@ export const SelectCategory: React.FC<IselectCategoryProps> = ({
 }) => {
   const { category } = useContext(Context);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+{ /* const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCategoryName =
       event.target.value === "" ? null : event.target.value;
     const selectedCategory = category.find(
       (category) => category.name === selectedCategoryName
-    );
+    ) || null;
     if (selectedCategory) {
       onChange(selectedCategory);
     }
+  };*/}
+
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCategoryName = event.target.value === "" ? null : event.target.value;
+    const selectedCategory = category?.find((cat) => cat.name === selectedCategoryName) || null;
+    onChange(selectedCategory);
   };
 
   return (
@@ -32,9 +38,9 @@ export const SelectCategory: React.FC<IselectCategoryProps> = ({
         onChange={handleChange}
         style={style}
       >
-        <option value="">Categorias</option>
+        <option className="bg-black" value="">CATEGORIAS</option>
         {category.map((categoria: ICategory) => (
-          <option key={categoria.id} className="bg-zinc-900 hover:bg-gray-700">
+          <option className="bg-black " key={categoria.id} >
             {categoria.name}
           </option>
         ))}

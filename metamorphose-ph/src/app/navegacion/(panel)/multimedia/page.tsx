@@ -5,16 +5,14 @@ import { Context, ICategory, Ifotos } from "@/context/context";
 import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import Image from "next/image";
-import { SelectCategory } from "@/components/selectCategory";
 
 export default function Multimedia() {
-  const { token, fotos, setFotos, loading, error, category } = useContext(Context);
+  const { token, fotos, setFotos, loading, error, category, selectedCategory } = useContext(Context);
   const [localFoto, setLocalFoto] = useState<Ifotos[]>([]);  // Fotos por categoría
   const [globalFotos, setGlobalFotos] = useState<Ifotos[]>([]); // Fotos globales
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedFoto, setSelectedFoto] = useState<Ifotos | null>(null);
   const [idSelected, setIdSelected] = useState<number[]>([]);
-  const [selectCategory, setSelectCategory] = useState<ICategory | null>(null);
 
   const idslength = idSelected?.length;
   const PORT = process.env.NEXT_PUBLIC_API_URL;
@@ -25,12 +23,6 @@ export default function Multimedia() {
     } else {
       setIdSelected((prevIds) => prevIds.filter((id) => id !== fotoId));
     }
-  };
-
-  
-  const handleCategoryChange = (category: ICategory | null) => {
-    setSelectCategory(category || null);
-    setLocalFoto([])
   };
 
   const handlePutIds = async (ids: number[]) => {
@@ -45,7 +37,7 @@ export default function Multimedia() {
 
     try {
       let response;
-      if (selectCategory) {
+      if (selectedCategory) {
         response = await fetch(`${PORT}/photos/updateorder`, {
           method: "PUT",
           headers: {
@@ -120,8 +112,8 @@ export default function Multimedia() {
   // Actualiza los estados de fotos por categoría y fotos globales
   useEffect(() => {
     if (token && token.token) {
-      if (selectCategory) {
-        const filteredFotos = fotos.filter((foto) => foto.category?.id === selectCategory.id);
+      if (selectedCategory) {
+        const filteredFotos = fotos.filter((foto) => foto.category?.id === selectedCategory.id );
         // Si hay una categoría seleccionada, usa las fotos de esa categoría
         setLocalFoto(
           filteredFotos.sort((a, b) => (a.categoryOrder || 0) - (b.categoryOrder || 0))
@@ -133,21 +125,20 @@ export default function Multimedia() {
         );
       }
     }
-  }, [fotos, token, selectCategory]);
+  }, [fotos, token, selectedCategory]);
 
   return (
     <div className="">
-      <SelectCategory onChange={handleCategoryChange} style={{ background:"transparent", color:"white", width:"13%", height:"5%", border:"none", padding:"1px", margin:"4px", position:"absolute", top:"10", left:"0", zIndex:"60" }}/>
-      {token ? (
+      {token ? (                                                
         <div
-          className="grid grid-cols-3 , mt-10 font-afacad"
+          className="grid grid-cols-3 font-afacad backdrop-blur-sm bg-black/50 rounded "
           style={{ scrollBehavior: "smooth",
-            maxHeight: "calc(90vh - 200px)",
+            maxHeight: "calc(98vh - 200px)",
             overflowY: "auto",
            }}
         >
           {/* Muestra las fotos de la categoría seleccionada o las fotos globales */}
-          {selectCategory ? (
+          {selectedCategory ? (
             localFoto.map((foto) => (
               <Card
                 key={foto.id}
@@ -188,7 +179,7 @@ export default function Multimedia() {
           )}
           <Modal isOpen={isModalOpen} onClose={() => toggleModal(null)}>
             <Image
-              className="w-full aspect-[1/1] object-cover mt-16 rounded"
+              className="w-full aspect-[1/1] object-cover mt-10 rounded"
               src={imageUrl}
               alt={title || "Imagen"}
               width={500}
@@ -200,7 +191,7 @@ export default function Multimedia() {
         <h1>No te encontras registrado</h1>
       )}
       {idslength === 2 && (
-        <button onClick={() => handlePutIds(idSelected)} className=" absolute top-0  right-2  transform hover:scale-110 transition duration-500 ease-in-out font-afacad fixed z-60 p-2">
+        <button onClick={() => handlePutIds(idSelected)} className=" absolute top-[-10%]  right-2  transform hover:scale-110 transition duration-500 ease-in-out font-afacad fixed z-60 p-2  animate-pulse ">
           REORDENAR
         </button>
       )}

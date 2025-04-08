@@ -18,7 +18,25 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  background-image: url("../../public/texture.jpg");
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 100% 50%;
+  position: relative; 
 }
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8cm; 
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  z-index: 0; /* Asegura que el gradiente esté encima del fondo pero debajo del contenido */
+}
+
 
 /* Estilo para la barra de desplazamiento */
 ::-webkit-scrollbar {

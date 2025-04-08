@@ -9,7 +9,7 @@ import { SelectCategory } from "@/components/selectCategory";
 
 export default function Carga() {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
-  const { setFotos, fotos, token } = useContext(Context);
+  const { setFotos, fotos, token, setCategory } = useContext(Context);
   const [error, setError] = useState<IformErrors>({});
   const [selectCategory, setSelectCategory] = useState<boolean>(true);
 
@@ -22,7 +22,9 @@ export default function Carga() {
     active: true,
   });
 
-  useEffect(() => {setError({}) }, [selectCategory]);
+  useEffect(() => {
+    setError({});
+  }, [selectCategory]);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
@@ -50,12 +52,11 @@ export default function Carga() {
         ...formImg,
         category: {
           id: 0,
-          name: "",},
-        })
-        setSelectCategory(!selectCategory);
+          name: "",
+        },
+      });
+      setSelectCategory(!selectCategory);
     }
-
-
   };
   const handleCategoryChange = (category: ICategory | null) => {
     setFormImg({
@@ -120,6 +121,17 @@ export default function Carga() {
       const data: { photo: Ifotos } = await response.json();
       if (data.photo) {
         setFotos([...fotos, data.photo as Ifotos]);
+      }
+
+      if (formImg.category?.id === 0) {
+        // Usamos el valor actual del estado `categories` dentro de la función de actualización
+        setCategory((prevCategories: ICategory[]) => {
+          // Añadimos la categoría si no existe
+          if (!prevCategories.some((category: ICategory) => category.name === formImg.category?.name)) {
+            return [...prevCategories, formImg.category as ICategory];
+          }
+          return prevCategories; // Si ya existe, no la agregamos de nuevo
+        });
       }
       toast.success("Imagen cargada exitosamente", {
         style: {
@@ -220,14 +232,22 @@ export default function Carga() {
           </div>
         ) : (
           <div>
-      
             <button
               onClick={() => setSelectCategory(true)}
               className="hover:text-gray-500 text-white"
             >
               crear categoria
             </button>
-            <SelectCategory onChange={handleCategoryChange} value={formImg.category?.name || ""} style={{ color: 'gray', backgroundColor: 'transparent', outline: 'none' }} />          </div>
+            <SelectCategory
+              onChange={handleCategoryChange}
+              value={formImg.category?.name || ""}
+              style={{
+                color: "gray",
+                backgroundColor: "transparent",
+                outline: "none",
+              }}
+            />{" "}
+          </div>
         )}
 
         <div className="grid grid-cols-2 gap-4 ">
@@ -280,13 +300,15 @@ export default function Carga() {
             <p className="text-red-500 text-xs">{error.active}</p>
           )}
         </div>
-      <button className="text-sm border-b-2 border-gray-400 hover:border-none flex flex-col justify-center items-center rounded-lg  w-24 h-8 ">
-        cargar
-      </button>
+        <button className="text-sm border-b-2 border-gray-400 hover:border-none flex flex-col justify-center items-center rounded-lg  w-24 h-8 ">
+          cargar
+        </button>
       </div>
 
-      <div className="
-      border rounded flex flex-col p-4 gap-2 h-[300px] justify-evenly ">
+      <div
+        className="
+      border rounded flex flex-col p-4 gap-2 h-[300px] justify-evenly "
+      >
         <p className="text-white rounded">TITULO: {formImg.title}</p>
         <p className="text-white rounded">
           CATEGORIA: {formImg.category?.name || "no seleccionada"}

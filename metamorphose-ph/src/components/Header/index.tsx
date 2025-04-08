@@ -4,7 +4,7 @@ import Navbar from "../Navbar";
 
 export default function Header() {
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center relative z-50">
       <Image
         src={Titulo}
         alt={"Titulo Metamorphose"}
