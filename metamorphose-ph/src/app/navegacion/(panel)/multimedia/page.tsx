@@ -126,14 +126,15 @@ export default function Multimedia() {
       }
     }
   }, [fotos, token, selectedCategory]);
+  
 
   return (
     <div className="">
       {token ? (                                                
         <div
-          className="grid grid-cols-3 font-afacad backdrop-blur-sm bg-black/50 rounded "
+          className="grid grid-cols-3 font-afacad backdrop-blur-sm bg-black/50 rounded"
           style={{ scrollBehavior: "smooth",
-            maxHeight: "calc(98vh - 200px)",
+            maxHeight: "70vh",
             overflowY: "auto",
            }}
         >
@@ -177,6 +178,10 @@ export default function Multimedia() {
               />
             ))
           )}
+        </div>
+      ) : (
+        <h1>No te encontras registrado</h1>
+      )}
           <Modal isOpen={isModalOpen} onClose={() => toggleModal(null)}>
             <Image
               className="w-full aspect-[1/1] object-cover mt-10 rounded"
@@ -186,12 +191,8 @@ export default function Multimedia() {
               height={500}
             />
           </Modal>
-        </div>
-      ) : (
-        <h1>No te encontras registrado</h1>
-      )}
       {idslength === 2 && (
-        <button onClick={() => handlePutIds(idSelected)} className=" absolute top-[-10%]  right-2  transform hover:scale-110 transition duration-500 ease-in-out font-afacad fixed z-60 p-2  animate-pulse ">
+        <button onClick={() => handlePutIds(idSelected)} className=" absolute top-[-4.5%]  right-2  transform hover:scale-110 transition duration-500 ease-in-out font-afacad fixed z-60  animate-pulse ">
           REORDENAR
         </button>
       )}
