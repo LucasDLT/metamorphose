@@ -1,13 +1,17 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Context, ICategory } from "@/context/context";
 import { toast } from "sonner";
 import { SelectCategory } from "../selectCategory";
+import Multimedia from "@/app/navegacion/(panel)/multimedia/page";
+
 
 export default function Navbar() {
   const router = useRouter();
+  const path = usePathname();
+  const multimedia = path.includes("multimedia");
   const { token, setToken, setCategory, category, setSelectedCategory } =
     useContext(Context);
 
@@ -35,7 +39,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="flex flex-col justify-center items-center text-xs text-white p-1 m-2 gap-4 text-right fixed z-50 top-[50%] right-[0%] tracking-wide font-afacad ">
+    <nav className="w-[8%] h-60 flex flex-col justify-center items-center text-xs text-white text-center gap-4 fixed z-50 top-[40%] right-[0%] tracking-wide font-afacad  ">
       {token && (
         <div className="transform transition hover:translate-x-[-10%] duration-500 ease-in-out ">
           <Link href={"/"} onClick={logOut}>
@@ -56,13 +60,12 @@ export default function Navbar() {
           <Link href={"/navegacion"}>PANEL</Link>
         </div>
       )}
-      {token && (
-        <div className="">
+      {token && multimedia && (
+
           <SelectCategory
-            style={{color: 'white', backgroundColor: 'transparent', outline: 'none', width: '80%', padding:'5px', letterSpacing: '0.5px'}}
+            style={{color: 'white', backgroundColor: 'transparent', outline: 'none', letterSpacing: '0.5px', position: 'absolute', top: '75%'}}
             onChange={handleCategoryChange}
           />
-        </div>
       )}
     </nav>
   );
