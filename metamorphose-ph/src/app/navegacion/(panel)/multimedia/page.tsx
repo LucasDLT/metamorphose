@@ -135,6 +135,7 @@ export default function Multimedia() {
           className="grid grid-cols-3 font-afacad backdrop-blur-sm bg-black/50 rounded"
           style={{ scrollBehavior: "smooth",
             maxHeight: "70vh",
+            height: "70vh",
             overflowY: "auto",
            }}
         >
