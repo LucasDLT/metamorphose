@@ -17,7 +17,6 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
   background-image: url("../../public/texture.jpg");
   background-attachment: fixed;
   background-size: cover;
@@ -69,3 +68,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   
 }
 
+input[type="file"]::-webkit-file-upload-button {
+  background-color: #000000;  /* Cambiar el color de fondo */
+  color: white;  /* Cambiar el color del texto */
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background-color: rgb(243, 243, 243);  /* Cambiar el color de fondo al pasar el mouse */
+  transition: all 0.3s ease-in-out;
+  color: black ;
+}

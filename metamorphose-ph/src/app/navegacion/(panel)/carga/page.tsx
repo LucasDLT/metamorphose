@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { IformErrors } from "@/types/error.t";
 import { validateCargaImgen } from "@/helpers/validate";
 import { SelectCategory } from "@/components/selectCategory";
+import Image from "next/image";
 
 export default function Carga() {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
@@ -161,109 +162,120 @@ export default function Carga() {
   return (
     <form
       onSubmit={handleFile}
-      className="flex flex-row gap-4 rounded font-afacad border w-full p-4 justify-between items-center"
+      className="flex flex-row gap-4 rounded font-afacad w-full justify-between items-center"
       method="POST"
     >
       {/*bloque para la imagen */}
       <div className="grid place-items-center">
-        <h1 className="text-xl text-center">CARGA DE IMAGENES</h1>
+        <h1 className="text-3xl text-center p-2 font-bold text-white drop-shadow-[2px_2px_2px_black]">CARGA DE IMAGENES</h1>
         <input
-          className="text-gray-300"
+          className="text-gray-300 pl-2 mt-5 background-black "
           type="file"
           name="url"
           id="url"
+          accept="image/*"
           onChange={handleFileChange}
         />
-        {error.url && <p className="text-red-500">{error.url}</p>}
         <div
-          className="rounded object-cover "
+          
           style={{ width: "300px", height: "400px" }}
         >
           {formImg?.url && (
-            <img
-              src={URL.createObjectURL(formImg.url)}
-              alt="preview"
-              className="object-cover rounded"
-              style={{ width: "100%", height: "100%" }}
-            />
+            <Image 
+            src={URL.createObjectURL(formImg.url)} 
+            alt="preview"       
+            className=" aspect-[1/1] object-cover rounded w-full h-full mt-1  border-opacity-90 shadow-[0_0_20px_5px_rgba(0,0,0,0.8)] hover:shadow-none transition duration-300 ease-in-out"
+            width={500}
+            height={500}/>
           )}
+      {error.url && <p className="text-red-600 text-center p-1 bg-black/60 mt-40 rounded drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{error.url}</p>}
+
         </div>
       </div>
       {/*bloque para los datos adicionales */}
-      <div className=" border rounded flex flex-col p-4 gap-2 h-[300px] justify-evenly items-center">
-        <label htmlFor="title">titulo</label>
+      <div className="flex flex-col items-center h-[450px] w-[300px]  ">
+        <div className="flex flex-col bg-black/80  w-[250px] text-center rounded ">
+        <label htmlFor="title">TITULO</label>
         <input
-          className="text-white bg-transparent border-b focus:outline-none"
+          className="text-white bg-transparent border-b border-gray-100 focus:outline-none animate-pulse"
           type="text"
           name="title"
           id="title"
           onChange={handleChange}
           value={formImg.title}
         />
-
-        <label htmlFor="history">historia</label>
+        </div>
+        <div className="flex flex-col bg-black/80 w-[250px] text-center rounded mt-1">
+        <label htmlFor="history">HISTORIA</label>
         <input
           type="text"
           name="history"
           id="history"
           onChange={handleChange}
           value={formImg.history}
-          className="text-white bg-transparent border-b focus:outline-none "
+          className="text-white bg-transparent border-b border-gray-100 focus:outline-none animate-pulse "
         />
+        </div>
         {/* bloque selector para la categoria */}
 
         {selectCategory ? (
-          <div>
-            <label htmlFor="category">crear categoria</label>
-            <button
-              onClick={handleActiveChange}
-              className="hover:text-gray-500 text-white"
-            >
-              seleccionar existente
-            </button>
+          <div className="flex flex-col bg-black/80 h-[100px] w-[250px] text-center p-2 rounded mt-1">
+            <label className="mt-2" htmlFor="category">CREAR CATEGORIA</label>
             <input
               type="text"
               name="category"
               id="category"
               onChange={handleCategoryInputChange}
               value={formImg.category?.name || ""}
-              className="text-white bg-transparent border-b focus:outline-none"
+              className="text-white bg-transparent border border-gray-100 rounded focus:outline-none animate-pulse"
             />
+            <button
+              onClick={handleActiveChange}
+              className="hover:text-gray-500 text-white animate-pulse mt-2"
+            >
+              * seleccionar existente
+            </button>
           </div>
         ) : (
-          <div>
-            <button
-              onClick={() => setSelectCategory(true)}
-              className="hover:text-gray-500 text-white"
-            >
-              crear categoria
-            </button>
+          <div className="flex flex-col bg-black/80 h-[100px] w-[250px] text-center p-2 rounded mt-1">
             <SelectCategory
               onChange={handleCategoryChange}
               value={formImg.category?.name || ""}
               style={{
-                color: "gray",
+                color: "white",
                 backgroundColor: "transparent",
                 outline: "none",
+                textAlign: "center",
+                marginTop: "10px",
+                animation: 'pulse 2s infinite'
+                
               }}
-            />{" "}
+            />
+              <button
+                onClick={() => setSelectCategory(true)}
+                className="hover:text-gray-500 text-white animate-pulse mt-8"
+              >
+               * crear categoria
+              </button>
           </div>
         )}
+            {/* bloque para la fecha y el active*/}
+        <div className="grid grid-cols-2 text-center mt-1 w-[250px]">
 
-        <div className="grid grid-cols-2 gap-4 ">
-          <div className="flex flex-col">
-            <label htmlFor="createdAt">fecha</label>
+          <div className="flex flex-col bg-black/80 rounded mr-1">
+            <label htmlFor="createdAt">FECHA</label>
             <input
               type="date"
               name="createdAt"
               id="createdAt"
               onChange={handleChange}
-              className="text-white bg-transparent focus:outline-none"
+              className="text-white bg-transparent focus:outline-none text-center p-1 text-sm"
               value={formImg.createdAt}
             />
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="active">active</label>
+
+          <div className="flex flex-col  bg-black/80 rounded">
+            <label htmlFor="active">VISIBLE</label>
             <select
               name="active"
               id="active"
@@ -274,35 +286,36 @@ export default function Carga() {
                 });
               }}
               value={formImg?.active?.toString()}
-              className="text-white bg-transparent focus:outline"
+              className="text-white bg-transparent text-center focus:outline"
             >
               <option value="true" className="bg-zinc-900 hover:bg-gray-700">
-                chi
+                si
               </option>
               <option value="false" className="bg-zinc-900 hover:bg-gray-700">
-                ño
+                no
               </option>
             </select>
           </div>
         </div>
-        <div className="flex flex-col max-w-xs ">
-          {error.title && <p className="text-red-500 text-xs">{error.title}</p>}
+        <button className="text-sm border-b-2 border-gray-500 mt-2 hover:border-none flex flex-col justify-center items-center rounded-lg  w-40 h-10 bg-gradient-to-t from-black to-zinc/10 ">
+          CARGAR
+        </button>
+        {/* bloque para ver errores*/}
+        <div className="flex flex-col w-[250px] rounded drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mt-9 ">
+          {error.title && <p className="text-red-500 text-sm p-1 bg-black/70">{error.title}</p>}
 
           {error.history && (
-            <p className="text-red-500 text-xs">{error.history}</p>
+            <p className="text-red-500 text-sm p-1 bg-black/70">{error.history}</p>
           )}
 
           {error.createdAt && (
-            <p className="text-red-500 text-xs">{error.createdAt}</p>
+            <p className="text-red-500 text-sm p-1 bg-black/70">{error.createdAt}</p>
           )}
 
           {error.active && (
-            <p className="text-red-500 text-xs">{error.active}</p>
+            <p className="text-red-500 text-sm p-1 bg-black/70">{error.active}</p>
           )}
         </div>
-        <button className="text-sm border-b-2 border-gray-400 hover:border-none flex flex-col justify-center items-center rounded-lg  w-24 h-8 ">
-          cargar
-        </button>
       </div>
 
       <div
