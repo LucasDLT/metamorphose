@@ -1,13 +1,11 @@
-'use client'
+"use client";
 
 import { useContext, useEffect, useState } from "react";
 import { Context, Ifotos } from "@/context/context";
-import { Card } from "@/components/Card";
-import Image from "next/image"
+import { FormImage } from "@/components/FormImage";
 
-export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
+export const EditImage = ({ params }: { params: Promise<{ id: number }> }) => {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
-
   const { token } = useContext(Context);
   const [dataFetch, setDataFetch] = useState<Ifotos | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -51,7 +49,11 @@ export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
         const data: Ifotos = await response.json();
         setDataFetch(data);
       } catch (error) {
-        setError(error instanceof Error ? error.message : "Ocurrió un error desconocido");
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Ocurrió un error desconocido"
+        );
         setDataFetch(null);
       } finally {
         setLoading(false);
@@ -71,19 +73,34 @@ export const ImageById = ({ params }: { params: Promise<{ id: number }> }) => {
     return <div>Error: {error}</div>;
   }
 
+  const handleEdit = async (formData: FormData) => {
+    try {
+      const response = await fetch(`${PORT}/photos/update/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token?.token}`,
+        },
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error("Ocurrio un error al actualizar la imagen");
+      }
+      const data = await response.json();
+      console.log(" datos modificados", data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       {dataFetch ? (
-     <div className="border-2 border-gray-400 w-2/3">
-      <Image className="h-4/5 rounded"  src={!dataFetch.url ? "" : dataFetch.url} alt={dataFetch.title ? dataFetch.title : ""} width={500} height={100} ></Image>
-      <h3>{dataFetch.title}</h3>
-     </div>
+        <FormImage defaultValue={dataFetch} mode="edit" onSubmit={handleEdit} />
       ) : (
         <div>No se encontraron datos</div>
       )}
-      
     </>
   );
 };
 
-export default  ImageById;
+export default EditImage;
