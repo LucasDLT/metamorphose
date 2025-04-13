@@ -30,15 +30,18 @@ export const getImageById = async (id: number):Promise <Image | null> => {
 };
 
 // Función para actualizar una imagen
-export const updateImage = async (id: number, updatedData: Partial<Image>): Promise<Image | null> => {
+export const updateImage = async (
+  id: number,
+  updatedData: Partial<Image>
+): Promise<Image | null> => {
   const image = await imageRepository.findOne({
     where: { id },
-    relations: ["category"], // Asegura que trae la relación
+    relations: ["category"],
   });
 
   if (!image) return null;
 
-  // Verificar si se pasó una nueva categoría
+  // Manejo de categoría (crear si no existe)
   if (updatedData.category && typeof updatedData.category === "string") {
     let category = await categoryRepository.findOne({ where: { name: updatedData.category } });
 
@@ -47,24 +50,17 @@ export const updateImage = async (id: number, updatedData: Partial<Image>): Prom
       await categoryRepository.save(category);
     }
 
-    if (category.id !== image.category.id) {
-      updatedData.category = category;
-    }
-  }
-  if (!updatedData.categoryOrder) {
-    updatedData.categoryOrder = image.categoryOrder
-  }
-  if (!updatedData.globalOrder) {
-    updatedData.globalOrder = image.globalOrder
+    updatedData.category = category;
   }
 
+  // Actualizar solo propiedades enviadas
   Object.assign(image, updatedData);
-  console.log("datos actualizados", image);
-  
-   await imageRepository.save(image);
+
+  await imageRepository.save(image);
 
   return image;
 };
+
 
 
 // Función para eliminar una imagen

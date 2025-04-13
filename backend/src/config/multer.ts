@@ -19,7 +19,7 @@ const storage = new CloudinaryStorage({
       return file.originalname.split(".")[0];
     },
   } as CloudinaryParams, // Asegura el tipado correcto
-});
+}); 
 
 const upload = multer({ storage });
 export default upload;

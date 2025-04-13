@@ -11,7 +11,7 @@ router.get("/photos", authenticateJWT, getAdminPhotos);
 router.post("/photos/upload", authenticateJWT, upload.single("image"), multerErrorHandler, uploadPhoto);
 
 // Ruta para actualizar una foto existente (protegida)
-router.put("/photos/update/:id", authenticateJWT, updatePhoto);
+router.put("/photos/update/:id", authenticateJWT, upload.single("image"), multerErrorHandler, updatePhoto);
 
 // Ruta para eliminar una foto (protegida)
 router.delete("/photos/:id", authenticateJWT, deletePhoto);
