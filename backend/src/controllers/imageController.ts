@@ -77,24 +77,38 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
 // Actualizar una foto existente
 export const updatePhoto = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  const { title, history, url, active, category, categoryOrder, globalOrder} = req.body;
-  console.log("se recibe esto en actualizar:", JSON.stringify(req.body, null, 2));
-  
+
+  // Parseo y limpieza de datos
+  const updatedFields = Object.fromEntries(
+    Object.entries({
+      title: req.body.title,
+      history: req.body.history,
+      active: req.body.active === 'true' || req.body.active === true,
+      category: req.body.category,
+    }).filter(([_, value]) => value !== undefined && value !== null)
+  );
 
   try {
-    const updatedImage = await updateImage(parseInt(id), { title, history, url, active, category, categoryOrder, globalOrder });
-    console.log("se recibe esto en actualizar:", JSON.stringify(updatedImage, null, 2));
-    
+    // Si llega una imagen nueva, subir a Cloudinary
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      updatedFields.url = result.secure_url;
+    }
+
+    const updatedImage = await updateImage(parseInt(id), updatedFields);
 
     if (!updatedImage) {
-       res.status(404).json({ message: "Foto no encontrada." });
+      res.status(404).json({ message: "Foto no encontrada." });
+      return;
     }
 
     res.json({ message: "Foto actualizada con éxito.", photo: updatedImage });
   } catch (error) {
+    console.error("Error al actualizar:", error);
     res.status(500).json({ message: "Error al actualizar la foto." });
   }
 };
+
 
 // Eliminar una foto
 export const deletePhoto = async (req: Request, res: Response): Promise<void> => {
