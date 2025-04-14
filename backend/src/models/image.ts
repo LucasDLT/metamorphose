@@ -33,6 +33,9 @@ export class Image {
   @Column({default: 0})
   categoryOrder: number;
 
+  @Column()
+  public_id: string;// esto es para cloudinary para poder borrar as imagenes de alli cuando saco las de la BBD
+
   // Relación con categorías (muchas imágenes pueden tener una categoría)
   @ManyToOne(() => Category, (category) => category.images, { eager: true })
   category: Category;

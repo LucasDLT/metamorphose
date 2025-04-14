@@ -5,9 +5,11 @@ import { UploadApiOptions } from "cloudinary";
 import cloudinary from "./cloudinary";
 
 // Define los parámetros específicos para Cloudinary
-interface CloudinaryParams extends UploadApiOptions {
+type CloudinaryParams = Partial<UploadApiOptions> & {
   folder: string;
-  public_id: any
+  public_id: (req: Request, file: Express.Multer.File) => string;
+  overwrite?: boolean;
+  invalidate?: boolean;
 }
 
 const storage = new CloudinaryStorage({
@@ -15,11 +17,14 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "metamorphose",
     allowed_formats: ["jpeg", "png", "jpg"], // Usa allowed_formats para TypeScript
+    overwrite: true,
+    invalidate: true,
     public_id: (req: Request, file: Express.Multer.File): string => {
-      return file.originalname.split(".")[0];
+      const uniqueSuffix = Date.now();
+      return `${file.originalname.split(".")[0]}-${uniqueSuffix}`;
     },
   } as CloudinaryParams, // Asegura el tipado correcto
-}); 
+});
 
 const upload = multer({ storage });
 export default upload;
