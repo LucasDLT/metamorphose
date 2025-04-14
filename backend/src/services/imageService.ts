@@ -1,6 +1,7 @@
 import { AppDataSource } from "../config/data-source";
 import { Image } from "../models/image";
 import { Category } from "../models/category";
+import cloudinary from "../config/cloudinary";
 // Array en memoria para simular la base de datos
 let imageRepository= AppDataSource.getRepository(Image);
 let categoryRepository= AppDataSource.getRepository(Category);
@@ -8,10 +9,15 @@ let categoryRepository= AppDataSource.getRepository(Category);
 
 // Función para crear una nueva imagen
 export const createImage = async (imageData: Omit<Image, "id" | "createdAt">): Promise<Image> => {
-  let category = await categoryRepository.findOne({ where: { name: imageData.category.name } });
+  if (!imageData.category?.name) {
+    throw new Error("El nombre de la categoría es requerido.");
+  }  
+  const categoryName = imageData.category.name.trim().toLowerCase();
+
+  let category = await categoryRepository.findOne({ where: { name: categoryName } });
   
   if (!category) {
-    category = categoryRepository.create({ name: imageData.category.name });
+    category = categoryRepository.create({ name: categoryName });
     await categoryRepository.save(category);
   }
 
@@ -21,7 +27,7 @@ export const createImage = async (imageData: Omit<Image, "id" | "createdAt">): P
 }
 // Función para obtener todas las imágenes
 export const getAllImages = async ():Promise <Image[]> => {
-  return await imageRepository.find();
+  return await imageRepository.find({ relations: ["category"] });
 };
 
 // Función para obtener una imagen por su ID
@@ -69,3 +75,17 @@ export const deleteImage = async (id: number):Promise <boolean> =>{
   return index.affected !== 0;
 
 }
+export const deleteImageFromCloudinary = async (publicId: string) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log("Imagen eliminada de Cloudinary:", result);
+    if (result.result !== 'ok') {
+      console.log("Error al eliminar imagen de Cloudinary:", result);
+      
+    }
+    return result;
+  } catch (error) {
+    console.error("Error al eliminar imagen de Cloudinary:", error);
+    throw error;
+  }
+};

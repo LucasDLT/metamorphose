@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { createImage, getAllImages, getImageById, updateImage, deleteImage } from "../services/imageService";
+import { createImage, getAllImages, getImageById, updateImage, deleteImage, deleteImageFromCloudinary } from "../services/imageService";
 import { v2 as cloudinary } from 'cloudinary';
 
 import { createCategory } from "../services/categoryService";
 import { getNextGlobalOrderNumber, getNextOrderNumberInCategory } from "../services/orderImageService";
 import { swapCategoryOrder, swapGlobalOrder } from "../services/reorderImageService";
+import { log } from "console";
 
 
 // Obtener todas las fotos del admin
@@ -37,7 +38,7 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
       res.status(400).json({ message: "Archivo de imagen no proporcionado." });
       return;
     }
-    cloudinary.uploader.upload(req.file.path, async (error, result) => {
+       cloudinary.uploader.upload(req.file.path, async (error, result) => {
       if (error) {
         console.error("Error al subir la foto:", JSON.stringify(error, null, 2));
         res.status(500).json({ message: "Error al subir la foto." });
@@ -48,6 +49,7 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
       // Aquí el resultado debe contener la URL de la imagen subida
       const imageUrl = result?.secure_url;
       console.log("URL de la imagen:", imageUrl);
+      const publicId = result?.public_id;
       
       if (!imageUrl) {
         console.error("No se encontró URL en el resultado de Cloudinary.");
@@ -63,8 +65,8 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
       
     
       // Resto de la lógica para guardar la imagen en tu base de datos
-      const newImage = await createImage({ title, history, url: imageUrl, active, category: categoryCreated, categoryOrder: orderNumberInCategory, globalOrder: orderNumberGlobal });
-      console.log("Nueva imagen creada:", JSON.stringify(newImage, null, 2));
+const newImage = await createImage({ title, history, url: imageUrl, active, category: categoryCreated, categoryOrder: orderNumberInCategory, globalOrder: orderNumberGlobal, public_id: publicId ?? "" }); 
+     console.log("Nueva imagen creada:", JSON.stringify(newImage, null, 2));
       res.status(201).json({ message: "Foto subida con éxito.", photo: newImage });
     });
     
@@ -77,8 +79,6 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
 // Actualizar una foto existente
 export const updatePhoto = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-
-  // Parseo y limpieza de datos
   const updatedFields = Object.fromEntries(
     Object.entries({
       title: req.body.title,
@@ -88,26 +88,39 @@ export const updatePhoto = async (req: Request, res: Response): Promise<void> =>
     }).filter(([_, value]) => value !== undefined && value !== null)
   );
 
+
   try {
-    // Si llega una imagen nueva, subir a Cloudinary
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      updatedFields.url = result.secure_url;
-    }
-
-    const updatedImage = await updateImage(parseInt(id), updatedFields);
-
-    if (!updatedImage) {
+    const image = await getImageById(parseInt(id));
+    if (!image) {
       res.status(404).json({ message: "Foto no encontrada." });
       return;
     }
 
+    // Si hay una nueva imagen, eliminar la anterior de Cloudinary y subir la nueva
+    if (req.file) {
+      if (image.public_id) {
+        console.log("Eliminando imagen previa de Cloudinary:", image.public_id);
+        await deleteImageFromCloudinary(image.public_id);
+      }
+
+      const result = await cloudinary.uploader.upload(req.file.path);
+      updatedFields.url = result.secure_url;
+      updatedFields.public_id = result.public_id;
+    }
+
+    const updatedImage = await updateImage(parseInt(id), updatedFields);
+
+    const timestamp = Date.now();
+    const imageUrlWithTimestamp = `${updatedImage?.url}?t=${timestamp}`;
+
     res.json({ message: "Foto actualizada con éxito.", photo: updatedImage });
   } catch (error) {
-    console.error("Error al actualizar:", error);
+    console.error("Error al actualizar la foto:", error);
     res.status(500).json({ message: "Error al actualizar la foto." });
   }
 };
+
+
 
 
 // Eliminar una foto
@@ -115,13 +128,27 @@ export const deletePhoto = async (req: Request, res: Response): Promise<void> =>
   const { id } = req.params;
 
   try {
-    const isDeleted = await deleteImage(parseInt(id));
-
-    if (!isDeleted) {
-       res.status(404).json({ message: "Foto no encontrada." });
+    const image = await getImageById(parseInt(id));
+    
+    if (!image) {
+      res.status(404).json({ message: "Foto no encontrada." });
     }
+    
+    if (image?.public_id) {
+      console.log("Public ID:", image.public_id);
+      
+      await deleteImageFromCloudinary(image.public_id);
+    }
+    
+   // await deleteImageFromCloudinary(image!.public_id)
 
+
+    const isDeleted = await deleteImage(parseInt(id));
+    if (!isDeleted) {
+      res.status(404).json({ message: "Foto no encontrada." });
+    }
     const updatePhotos = await getAllImages();
+    
 
     res.json({ message: "Foto eliminada con éxito.", photos: updatePhotos });
 
