@@ -113,7 +113,8 @@ export const updatePhoto = async (req: Request, res: Response): Promise<void> =>
     const timestamp = Date.now();
     const imageUrlWithTimestamp = `${updatedImage?.url}?t=${timestamp}`;
 
-    res.json({ message: "Foto actualizada con éxito.", photo: updatedImage });
+    const updateList = await getAllImages();
+    res.json({ message: "Foto actualizada con éxito.", photo: updateList });
   } catch (error) {
     console.error("Error al actualizar la foto:", error);
     res.status(500).json({ message: "Error al actualizar la foto." });
