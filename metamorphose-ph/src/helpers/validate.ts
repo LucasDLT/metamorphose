@@ -37,7 +37,7 @@ export const validateForm = (form: Iuser): Ierror => {
 //validacion de la carga de imagenes
 export const validateCargaImgen = (form:Ifotos):IformErrors => {
   const errors: IformErrors = {};
-  const tiposPermitidos = ["image/jpeg", "image/png", "image/gif", "image/jpg"];
+  const tiposPermitidos = ["image/jpeg", "image/png", "image/gif", "image/jpg", "image/webp", "image/avif"];
 
   if(!form.title) {
     errors.title = "El nombre de la imagen es obligatorio";
@@ -59,9 +59,15 @@ export const validateCargaImgen = (form:Ifotos):IformErrors => {
     errors.url = "La imagen es obligatoria";
   }
 
-  if(!form.url?.type || !tiposPermitidos.includes(form.url?.type)) {
+
+  if (!form.url) {
+    errors.url = "La imagen es obligatoria";
+  } else if (form.url instanceof File && (!form.url.type || !tiposPermitidos.includes(form.url.type))) {
     errors.url = "Formato de imagen no permitido";
   }
+  
+
+
 
   return errors
 };

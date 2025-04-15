@@ -6,7 +6,7 @@ import { FormImage } from "@/components/FormImage";
 
 export const EditImage = ({ params }: { params: Promise<{ id: number }> }) => {
   const PORT = process.env.NEXT_PUBLIC_API_URL;
-  const { token } = useContext(Context);
+  const { token, setFotos } = useContext(Context);
   const [dataFetch, setDataFetch] = useState<Ifotos | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,10 @@ export const EditImage = ({ params }: { params: Promise<{ id: number }> }) => {
     return <div>Error: {error}</div>;
   }
 
+
   const handleEdit = async (formData: FormData) => {
+    console.log("Formulario enviado:", formData);
+    
     try {
       const response = await fetch(`${PORT}/photos/update/${id}`, {
         method: "PUT",
@@ -86,11 +89,14 @@ export const EditImage = ({ params }: { params: Promise<{ id: number }> }) => {
         throw new Error("Ocurrio un error al actualizar la imagen");
       }
       const data = await response.json();
-      console.log(" datos modificados", data);
+      console.log(" datos modificados", data.photo );
+      setFotos(data.photo);
+
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   return (
     <>

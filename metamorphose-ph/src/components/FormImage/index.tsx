@@ -7,6 +7,7 @@ import { IformErrors } from "@/types/error.t";
 import { validateCargaImgen } from "@/helpers/validate";
 import { SelectCategory } from "@/components/selectCategory";
 import Image from "next/image";
+import ImagePreview from "../MemoPreview";
 
 export interface IformImage{
     onSubmit: (formData: FormData) => Promise<void>;
@@ -19,6 +20,8 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
   const { setFotos, fotos, token, setCategory } = useContext(Context);
   const [error, setError] = useState<IformErrors>({});
   const [selectCategory, setSelectCategory] = useState<boolean>(true);
+  const [image, setImage] = useState<File | null>(null);
+const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const MAX_HISTORY_LENGTH = 300;
 
   const [formImg, setFormImg] = useState<Ifotos>({
@@ -36,6 +39,15 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
       setFormImg(defaultValue);
     }
   }, [selectCategory, mode, defaultValue]);
+
+  useEffect(() => {
+  if (image) {
+    const url = URL.createObjectURL(image);
+    setPreviewUrl(url);
+
+    return () => URL.revokeObjectURL(url); // evita fugas de memoria
+  }
+}, [image]);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
@@ -58,6 +70,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
         ...formImg,
         url: file,
       });
+      setImage(file);// Actualiza el estado de la imagen
     }
     setError((prev) => {
       const updatedErrors = { ...prev };
@@ -167,8 +180,25 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
     formData.append("createdAt", formImg.createdAt ?? "");
     formData.append("active", formImg.active?.toString() ?? "");
     if (formImg.url instanceof File) {
-        formData.append("image", formImg.url);
-      }
+      formData.append("image", formImg.url);
+    } else if (typeof formImg.url === "string") {
+      // Es una edición y la imagen ya estaba guardada
+      formData.append("existingImage", formImg.url);
+    } else {
+      toast.warning("No se ha seleccionado ninguna imagen", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+          height: "40px",
+          width: "300px",
+          backgroundColor: "#6666662f",
+          fontFamily: "afacad",
+          padding: "10px",
+        },
+      });
+      return;
+    }
       
     try {
 
@@ -229,6 +259,13 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
     return "text-gray-400";
   };
   
+  const formatDate = (dataString: string) => {
+    const date = new Date(dataString);
+    return date.toISOString().split("T")[0];
+  }
+
+
+
   return (
     <form
       onSubmit={handleFile}
@@ -266,10 +303,25 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
                 height={500}
               />
             </>
-          )
-          : defaultValue?.url ? (
+          ) : typeof formImg.url === "string" ? ( <>
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded shadow absolute top-2 right-1"
+            >
+              X
+            </button>
+            <Image
+              src={formImg.url}
+              alt="preview"
+              className="aspect-[1/1] object-cover rounded w-full h-full mt-1 pb-3 border-opacity-90 shadow-[0_0_20px_5px_rgba(0,0,0,0.8)] hover:shadow-none transition duration-300 ease-in-out"
+              width={500}
+              height={500}
+            />
+          </>)
+          : previewUrl? (
               <Image 
-              src={defaultValue.url.toString()}
+              src={previewUrl ?? ""}
               alt="preview"
               className=" aspect-[1/1] object-cover rounded w-full h-full mt-1 pb-3 border-opacity-90 shadow-[0_0_20px_5px_rgba(0,0,0,0.8)] hover:shadow-none transition duration-300 ease-in-out"
               width={500}
@@ -366,7 +418,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
               id="createdAt"
               onChange={handleChange}
               className="text-white bg-transparent focus:outline-none text-center p-1 text-sm"
-              value={formImg.createdAt}
+              value={formImg.createdAt? formatDate(formImg.createdAt): ""}
             />
           </div>
 
@@ -456,3 +508,4 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
     </form>
   );
 }
+
