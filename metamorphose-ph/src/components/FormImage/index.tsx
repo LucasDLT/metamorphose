@@ -295,7 +295,7 @@ const [previewUrl, setPreviewUrl] = useState<string | null>(null);
               >
                 X
               </button>
-              <Image
+              <img
                 src={URL.createObjectURL(formImg.url)}
                 alt="preview"
                 className=" aspect-[1/1] object-cover rounded w-full h-full mt-1 pb-3 border-opacity-90 shadow-[0_0_20px_5px_rgba(0,0,0,0.8)] hover:shadow-none transition duration-300 ease-in-out"
@@ -320,13 +320,8 @@ const [previewUrl, setPreviewUrl] = useState<string | null>(null);
             />
           </>)
           : previewUrl? (
-              <Image 
-              src={previewUrl ?? ""}
-              alt="preview"
-              className=" aspect-[1/1] object-cover rounded w-full h-full mt-1 pb-3 border-opacity-90 shadow-[0_0_20px_5px_rgba(0,0,0,0.8)] hover:shadow-none transition duration-300 ease-in-out"
-              width={500}
-              height={500}
-              />
+             
+              <ImagePreview url={previewUrl} />
           ): null}
           {error.url && (
             <p className="text-red-600 text-center p-1 bg-black/60 mt-40 rounded drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
