@@ -23,6 +23,8 @@ export default function Carga() {
           } }
 
   return (
+  
     <FormImage mode="create" onSubmit={handleSubmit} />
+    
   )
 }

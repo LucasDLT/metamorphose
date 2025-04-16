@@ -43,9 +43,7 @@ export const validateCargaImgen = (form:Ifotos):IformErrors => {
     errors.title = "El nombre de la imagen es obligatorio";
   }
 
-  if(!form.history) {
-    errors.history = "La historia de la imagen es obligatorio";
-  }
+  
 
   if(!form.category) {
     errors.category = "La categoría de la imagen es obligatoria";
