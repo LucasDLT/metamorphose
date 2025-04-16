@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useContext } from "react";
+import { useEffect, useContext} from "react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Context, ICategory, Ifotos } from "@/context/context";
 import { toast } from "sonner";
 import { IformErrors } from "@/types/error.t";
@@ -8,6 +9,8 @@ import { validateCargaImgen } from "@/helpers/validate";
 import { SelectCategory } from "@/components/selectCategory";
 import Image from "next/image";
 import ImagePreview from "../MemoPreview";
+import {ConfirmModal} from "../ConfirmModal";
+import { set } from "zod";
 
 export interface IformImage{
     onSubmit: (formData: FormData) => Promise<void>;
@@ -21,8 +24,12 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
   const [error, setError] = useState<IformErrors>({});
   const [selectCategory, setSelectCategory] = useState<boolean>(true);
   const [image, setImage] = useState<File | null>(null);
-const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
+
   const MAX_HISTORY_LENGTH = 300;
+  const pathName = usePathname();
 
   const [formImg, setFormImg] = useState<Ifotos>({
     title: "",
@@ -78,6 +85,7 @@ const [previewUrl, setPreviewUrl] = useState<string | null>(null);
       return updatedErrors;
     });
   };
+
 
   const handleActiveChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -148,7 +156,55 @@ const [previewUrl, setPreviewUrl] = useState<string | null>(null);
       delete updatedErrors["url"];
       return updatedErrors;
     });
+    setPreviewUrl(null);
   };
+
+  {/*const handleConfirmSubmit = async () => {
+    if (!pendingFormData) return;
+  
+    try {
+      await onSubmit(pendingFormData);
+  
+      if (formImg.category?.id === 0) {
+        setCategory((prevCategories: ICategory[]) => {
+          if (
+            !prevCategories.some(
+              (category: ICategory) => category.name === formImg.category?.name
+            )
+          ) {
+            return [...prevCategories, formImg.category as ICategory];
+          }
+          return prevCategories;
+        });
+      }
+  
+      if (mode === "create") {
+        setFormImg({
+          title: "",
+          history: "",
+          category: { id: 0, name: "" },
+          url: null,
+          createdAt: "",
+          active: true,
+        });
+        setPreviewUrl(null);
+      }
+  
+      toast.success(
+        mode === "create"
+          ? "Imagen cargada exitosamente"
+          : "Imagen actualizada exitosamente",
+      );
+    } catch (error) {
+      toast.error("Error al cargar la imagen", { duration: 5000 });
+      console.error("Error en el post de imágenes", error);
+    } finally {
+      setModalIsOpen(false);
+      setPendingFormData(null);
+    }
+  };
+  */}
+
   const handleFile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -199,57 +255,67 @@ const [previewUrl, setPreviewUrl] = useState<string | null>(null);
       });
       return;
     }
-      
+    setPendingFormData(formData);
+    setModalIsOpen(true);
+  };
+
+  const handleConfirmSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!pendingFormData) return;
     try {
 
-       await onSubmit(formData);
+      await onSubmit(pendingFormData);
 
-      if (formImg.category?.id === 0) {
-        // Usamos el valor actual del estado `categories` dentro de la función de actualización
-        setCategory((prevCategories: ICategory[]) => {
-          // Añadimos la categoría si no existe
-          if (
-            !prevCategories.some(
-              (category: ICategory) => category.name === formImg.category?.name
-            )
-          ) {
-            return [...prevCategories, formImg.category as ICategory];
-          }
-          return prevCategories; // Si ya existe, no la agregamos de nuevo
-        });
-      }
+     if (formImg.category?.id === 0) {
+       // Usamos el valor actual del estado `categories` dentro de la función de actualización
+       setCategory((prevCategories: ICategory[]) => {
+         // Añadimos la categoría si no existe
+         if (
+           !prevCategories.some(
+             (category: ICategory) => category.name === formImg.category?.name
+           )
+         ) {
+           return [...prevCategories, formImg.category as ICategory];
+         }
+         return prevCategories; // Si ya existe, no la agregamos de nuevo
+       });
+     }
 
-      if (mode === "create") {
-          setFormImg({
-            title: "",
-            history: "",
-            category: { id: 0, name: "" },
-            url: null,
-            createdAt: "",
-            active: true,
-          });
-      }
-      setError({});
-      toast.success(
-        mode==="create"
-        ? "Imagen cargada exitosamente"
-        : "Imagen actualizada exitosamente"
-      , {
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-          height: "25px",
-          width: "200px",
-          backgroundColor: "#6666662f",
-          fontFamily: " afacad",
-        },
-      });
-    } catch (error) {
-      toast.error("Error al cargar la imagen", { duration: 5000 });
-      throw new Error("error en el post de imagenes" + error);
-    }
-  };
+     if (mode === "create") {
+         setFormImg({
+           title: "",
+           history: "",
+           category: { id: 0, name: "" },
+           url: null,
+           createdAt: "",
+           active: true,
+         });
+     }
+     setError({});
+     toast.success(
+       mode==="create"
+       ? "Imagen cargada exitosamente"
+       : "Imagen actualizada exitosamente"
+     , {
+       style: {
+         borderRadius: "10px",
+         background: "#333",
+         color: "#fff",
+         height: "25px",
+         width: "200px",
+         backgroundColor: "#6666662f",
+         fontFamily: " afacad",
+       },
+     });
+   } catch (error) {
+     toast.error("Error al cargar la imagen", { duration: 5000 });
+     throw new Error("error en el post de imagenes" + error);
+   }finally{
+     setModalIsOpen(false);
+     setPendingFormData(null);
+   }
+  }
+
   const getCounterColor = () => {
     const length = formImg.history?.length;
     const percentage = (length! / MAX_HISTORY_LENGTH) * 100;
@@ -264,9 +330,15 @@ const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     return date.toISOString().split("T")[0];
   }
 
+  const confirmMessage =
+  pathName === "carga"
+    ? "Vas a cargar una imagen, ¿estás seguro?"
+    : "Vas a modificar la imagen, ¿estás seguro?";
 
+  const confirmTitle = pathName === "carga" ? "Cargar Imagen" : "Modificar Imagen";
 
   return (
+    <>
     <form
       onSubmit={handleFile}
       className="flex flex-row gap-4 rounded font-afacad w-full justify-between items-center"
@@ -501,6 +573,8 @@ const [previewUrl, setPreviewUrl] = useState<string | null>(null);
         </div>
       </div>
     </form>
-  );
+      <ConfirmModal isOpen={(modalIsOpen)} onClose={() => setModalIsOpen(false)} onConfirm={handleConfirmSubmit} title={confirmTitle} message={confirmMessage} />
+      </>
+    );
 }
 

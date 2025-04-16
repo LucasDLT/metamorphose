@@ -3,6 +3,9 @@ import { useState } from "react";
 import { validateForm } from "@/helpers/validate";
 import { Ierror } from "@/types/error.t";
 import { Iuser } from "@/types/user.t";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { set } from "zod";
 interface IformRegisterProps {
   setToggle: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -15,6 +18,8 @@ export const FormRegister:React.FC<IformRegisterProps>=({setToggle})=> {
   });
 
   const [errors, setErrors] = useState<Ierror>({});
+
+  const router = useRouter();
 
   const PORT = process.env.NEXT_PUBLIC_API_URL;
 
@@ -50,9 +55,34 @@ export const FormRegister:React.FC<IformRegisterProps>=({setToggle})=> {
         throw new Error("Hubo un error en la solicitud");
       }
       const data = await response.json();
+      toast.success("Registro exitoso, Bienvenida",{ style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+        height: "25px",
+        width: "200px",
+        backgroundColor: "#6666662f",
+        fontFamily:" afacad",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }});
+      setToggle(false);
       console.log("registro: ", data);
     } catch (error) {
       console.error("Error al registrarse: ", error);
+      toast.error("Error al registrarse", { style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+        height: "25px",
+        width: "200px",
+        backgroundColor: "#6666662f",
+        fontFamily:" afacad",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }})
     }
   };
 

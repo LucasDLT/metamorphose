@@ -5,8 +5,6 @@ import { useContext, useEffect, useState } from "react";
 import { Context, ICategory } from "@/context/context";
 import { toast } from "sonner";
 import { SelectCategory } from "../selectCategory";
-import Multimedia from "@/app/navegacion/(panel)/multimedia/page";
-
 
 export default function Navbar() {
   const router = useRouter();
@@ -56,9 +54,11 @@ export default function Navbar() {
         <Link href={"/"}>INICIO</Link>
       </div>
       {token && (
-        <div className="trasnform hover:translate-x-[-10%] transition duration-500 ease-in-out">
+          // aca utilice template string para meter en la clase una condicion 
+          <div className={`trasnform hover:translate-x-[-10%] transition duration-500 ease-in-out ${path ==="/" ? "animate-pulse":""}`}>
           <Link href={"/navegacion"}>PANEL</Link>
         </div>
+      
       )}
       {token && multimedia && (
 

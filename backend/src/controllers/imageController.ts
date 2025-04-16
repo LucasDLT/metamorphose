@@ -26,9 +26,9 @@ export const uploadPhoto = async (req: Request, res: Response): Promise<void> =>
   
   const active = req.body.active==="true"
   
-  if (!title || !history  || !req.file ) {
-    console.log("Faltan campos obligatorios:", { title, history, file: req.file });
-    res.status(400).json({ message: "Título, historia y archivo de imagen son requeridos." });
+  if (!title  || !req.file ) {
+    console.log("Faltan campos obligatorios:", { title, file: req.file });
+    res.status(400).json({ message: "Título y archivo de imagen son requeridos." });
     return
   }
 
