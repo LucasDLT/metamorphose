@@ -12,7 +12,7 @@ export const createImage = async (imageData: Omit<Image, "id" | "createdAt">): P
   if (!imageData.category?.name) {
     throw new Error("El nombre de la categoría es requerido.");
   }  
-  const categoryName = imageData.category.name.trim().toLowerCase();
+  const categoryName = imageData.category.name.trim().toUpperCase();
 
   let category = await categoryRepository.findOne({ where: { name: categoryName } });
   
@@ -49,10 +49,11 @@ export const updateImage = async (
 
   // Manejo de categoría (crear si no existe)
   if (updatedData.category && typeof updatedData.category === "string") {
-    let category = await categoryRepository.findOne({ where: { name: updatedData.category } });
+    const normalizedName = (updatedData.category as string).trim().toUpperCase();
+    let category = await categoryRepository.findOne({ where: { name: normalizedName } });
 
     if (!category) {
-      category = categoryRepository.create({ name: updatedData.category });
+      category = categoryRepository.create({ name: normalizedName });
       await categoryRepository.save(category);
     }
 

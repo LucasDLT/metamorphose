@@ -22,4 +22,4 @@ export const AppDataSource = new DataSource({
 export const UserModel = AppDataSource.getRepository(User);
 export const ImageModel = AppDataSource.getRepository(Image);
 export const MailModel = AppDataSource.getRepository(Mail);
-export const CategoryModel = AppDataSource.getRepository(Category);
+export const CategoryModel = AppDataSource.getRepository(Category); 

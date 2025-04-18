@@ -7,10 +7,10 @@ const categoryRepository = AppDataSource.getRepository(Category);
 const imageRepository = AppDataSource.getRepository(Image);
 
 export const createCategory = async (name: string): Promise<Category> => {
-  
-  let category = await categoryRepository.findOneBy({ name });
+  const normalizedName = name.trim().toUpperCase();
+  let category = await categoryRepository.findOneBy({ name:normalizedName });
   if (!category) {
-    category = categoryRepository.create({ name });
+    category = categoryRepository.create({ name: normalizedName });
     await categoryRepository.save(category);
   }
   return category;
@@ -30,7 +30,7 @@ export const getAllCategories = async (): Promise<Category[]> => {
 export const updateCategory = async (id: number, name: string): Promise<Category | null> => {
   const category = await categoryRepository.findOneBy({ id });
   if (!category) return null;
-  category.name = name;
+  category.name = name.trim().toUpperCase();
   return await categoryRepository.save(category);
 };
 
