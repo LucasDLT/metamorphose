@@ -1,8 +1,10 @@
 import { Context, Ifotos } from "@/context/context";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Image from "next/image";
+import { ConfirmModal } from "../ConfirmModal";
+
 interface CardProps extends Ifotos {
-  handleDelete?: () => void;
+  handleDelete?: (id: number) => void;
   handleUpdate?: () => void;
   handleModal?: () => void;
   handleChecked?: (e: React.ChangeEvent<HTMLInputElement>) => void; //dejo esto aca para un selector de botones que se activa con el panel EDICION tengo que hacer dos bloques de divs para que se seleccione entre uno y otro, un boton que la active y le pase a esta funcion un valor booleano para que se muestre el otro. Se ve entre la vista multimedia y la de edicion de ubicacion.
@@ -48,7 +50,8 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
     }
   };
   return (
-    <div className="aspect-[5/4] h-100 w-100 m-1 flex flex-col items-center justify-center rounded font-sans relative z-0 ">
+    <>    
+    <div className="aspect-[1.446]  m-1 flex flex-col items-center justify-center rounded font-sans relative z-0 ">
       {!selected && (
         <div className="flex flex-row justify-between  text-xs w-full bg-black bg-opacity-80 z-10 font-afacad absolute top-0  ">
           <h2 className="text-gray-300 hover:text-gray-500 uppercase flex alingn-center transition duration-500 ease-in-out">
@@ -65,8 +68,8 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
       <Image
         src={imageUrl}
         alt={title || "Imagen"}
-        width={500}
-        height={333}
+        width={4120}
+        height={2848}
         className="flex justify-center items-center w-full h-full object-cover hover:opacity-80  transition duration-500 ease-in-out"
       />
       {!selected && (
@@ -85,8 +88,8 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
           </button>
           <button
             className="text-gray-300 hover:text-gray-500 transition duration-500 ease-in-out "
-            onClick={handleDelete}
-          >
+            onClick={() => handleDelete?.(fotos.id!)}
+            >
             ELIMINAR
           </button>
         </div>
@@ -107,5 +110,6 @@ export const Card: React.FC<CardProps> = (fotos: CardProps) => {
        className="absolute top-1 left-1 "
        />}
     </div>
+    </>
   );
 };

@@ -63,7 +63,7 @@ export default function Navbar() {
       {token && multimedia && (
 
           <SelectCategory
-            style={{color: 'white', backgroundColor: 'transparent', outline: 'none', letterSpacing: '0.5px', position: 'absolute', top: '75%'}}
+            style={{color: 'white', backgroundColor: 'transparent', outline: 'none', letterSpacing: '0.5px', position: 'absolute', top: '75%',  }}
             onChange={handleCategoryChange}
           />
       )}

@@ -1,10 +1,11 @@
 "use client";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Context, ICategory, Ifotos } from "@/context/context";
 import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import Image from "next/image";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
 export default function Multimedia() {
   const { token, fotos, setFotos, loading, error, category, selectedCategory } = useContext(Context);
@@ -13,9 +14,14 @@ export default function Multimedia() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedFoto, setSelectedFoto] = useState<Ifotos | null>(null);
   const [idSelected, setIdSelected] = useState<number[]>([]);
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  const [fotoIdToDelete, setFotoIdToDelete] = useState<number | null>(null);
+
 
   const idslength = idSelected?.length;
   const PORT = process.env.NEXT_PUBLIC_API_URL;
+
+
 
   const handleCheckboxChange = (fotoId: number, checked: boolean) => {
     if (checked) {
@@ -78,6 +84,7 @@ export default function Multimedia() {
   const router = useRouter();
 
   const handleDelete = async (id: number) => {
+    console.log("foto eliminada", id);
     if (loading) return <div>Cargando fotos...</div>;
     if (error) return <div>{error}</div>;
 
@@ -92,10 +99,29 @@ export default function Multimedia() {
       const data = await response.json();
       if (data.photos) {
         setFotos(data.photos);
+        
       }
     } catch (error) {
       console.error(error);
     }
+  };
+  
+  
+  const confirmDelete = (id: number) => {
+    setFotoIdToDelete(id);
+    setModalIsOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (fotoIdToDelete == null) return
+      console.log("fotoIdToDelete", fotoIdToDelete);
+      
+        await handleDelete(fotoIdToDelete);
+        setModalIsOpen(false);
+        setFotoIdToDelete(null);
+      
+        
+      
   };
 
   const handleUpdate = async (id: number) => {
@@ -150,7 +176,7 @@ export default function Multimedia() {
                 category={foto.category}
                 createdAt={foto.createdAt}
                 active={foto.active}
-                handleDelete={() => handleDelete(foto.id as number)}
+                handleDelete={() => confirmDelete(foto.id as number)}
                 handleUpdate={() => handleUpdate(foto.id as number)}
                 handleModal={() => toggleModal(foto as Ifotos)}
                 checked={idSelected.includes(foto.id as number)}
@@ -169,7 +195,7 @@ export default function Multimedia() {
                 category={foto.category}
                 createdAt={foto.createdAt}
                 active={foto.active}
-                handleDelete={() => handleDelete(foto.id as number)}
+                handleDelete={() => confirmDelete(foto.id as number)}
                 handleUpdate={() => handleUpdate(foto.id as number)}
                 handleModal={() => toggleModal(foto as Ifotos)}
                 checked={idSelected.includes(foto.id as number)}
@@ -184,19 +210,24 @@ export default function Multimedia() {
         <h1>No te encontras registrado</h1>
       )}
           <Modal isOpen={isModalOpen} onClose={() => toggleModal(null)}>
-            <Image
-              className="w-full aspect-[1/1] object-cover mt-10 rounded"
-              src={imageUrl}
-              alt={title || "Imagen"}
-              width={500}
-              height={500}
-            />
+          <div className=" w-[60vw] h-[40vh] flex justify-center items-center">
+
+          <Image
+  className="w-full h-auto object-contain"
+  src={imageUrl}
+  alt={title || "Imagen"}
+  width={4120}
+  height={2848}
+/>
+          </div>
           </Modal>
       {idslength === 2 && (
         <button onClick={() => handlePutIds(idSelected)} className=" absolute top-[-4.5%]  right-2  transform hover:scale-110 transition duration-500 ease-in-out font-afacad fixed z-60  animate-pulse ">
           REORDENAR
         </button>
       )}
+          <ConfirmModal isOpen={(modalIsOpen)} onClose={() => setModalIsOpen(false)} onConfirm={handleConfirmDelete} title={"Eliminar Fotos"} message={"Estas seguro de eliminar esta foto?"} />
+
     </div>
   );
 }

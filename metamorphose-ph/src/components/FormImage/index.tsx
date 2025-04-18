@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useContext} from "react";
+import { useEffect, useContext, useRef} from "react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Context, ICategory, Ifotos } from "@/context/context";
@@ -10,7 +10,6 @@ import { SelectCategory } from "@/components/selectCategory";
 import Image from "next/image";
 import ImagePreview from "../MemoPreview";
 import {ConfirmModal} from "../ConfirmModal";
-import { set } from "zod";
 
 export interface IformImage{
     onSubmit: (formData: FormData) => Promise<void>;
@@ -30,6 +29,8 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
 
   const MAX_HISTORY_LENGTH = 300;
   const pathName = usePathname();
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formImg, setFormImg] = useState<Ifotos>({
     title: "",
@@ -56,6 +57,8 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
   }
 }, [image]);
 
+
+
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
     setFormImg({
@@ -71,6 +74,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
+
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setFormImg({
@@ -157,6 +161,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
       return updatedErrors;
     });
     setPreviewUrl(null);
+    
   };
 
   {/*const handleConfirmSubmit = async () => {
@@ -257,6 +262,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
     }
     setPendingFormData(formData);
     setModalIsOpen(true);
+    setPreviewUrl( null)
   };
 
   const handleConfirmSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -313,6 +319,9 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
    }finally{
      setModalIsOpen(false);
      setPendingFormData(null);
+     if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Limpia el input file manualmente
+    }
    }
   }
 
@@ -331,7 +340,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
   }
 
   const confirmMessage =
-  pathName === "carga"
+  pathName.includes("carga")
     ? "Vas a cargar una imagen, ¿estás seguro?"
     : "Vas a modificar la imagen, ¿estás seguro?";
 
@@ -349,6 +358,12 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
         <h1 className="text-3xl text-center font-bold text-white drop-shadow-[2px_2px_2px_black]">
           CARGA DE IMAGENES
         </h1>
+        <label 
+        htmlFor="url"          
+        className="text-gray-300 pl-2 mt-1 background-black rounded cursor-pointer "
+        >
+          Seleccionar 
+        </label>
         <input
           className="text-gray-300 pl-2 mt-1 background-black "
           type="file"
@@ -356,6 +371,9 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
           id="url"
           accept="image/*"
           onChange={handleFileChange}
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          
         />
         <div style={{ width: "300px", height: "400px", position: "relative" }}>
           {formImg?.url  instanceof File ? (
@@ -443,7 +461,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
               name="category"
               id="category"
               onChange={handleCategoryInputChange}
-              value={formImg.category?.name || ""}
+              value={formImg.category?.name.toUpperCase() || ""}
               className="text-white bg-transparent border border-gray-100 rounded focus:outline-none animate-pulse"
             />
             <button
@@ -558,7 +576,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
           </p>
           <p className="mb-1">
             <strong>CATEGORÍA:</strong>
-            {formImg.category?.name || "no seleccionada"}
+            {formImg.category?.name.toUpperCase() || "no seleccionada"}
           </p>
           <p className="mb-1">
             <strong>FECHA:</strong> {formImg.createdAt}

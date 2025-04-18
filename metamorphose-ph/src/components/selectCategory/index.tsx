@@ -41,7 +41,7 @@ export const SelectCategory: React.FC<IselectCategoryProps> = ({
         <option className="bg-black" value="">CATEGORIAS</option>
         {category.map((categoria: ICategory) => (
           <option className="bg-black " key={categoria.id} >
-            {categoria.name}
+            {categoria.name.toUpperCase()}
           </option>
         ))}
       </select>
