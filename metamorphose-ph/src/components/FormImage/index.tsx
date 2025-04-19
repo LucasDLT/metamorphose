@@ -222,13 +222,12 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
       toast.warning("No se ha seleccionado ningun archivo", {
         style: {
           borderRadius: "10px",
-          background: "#333",
+          background: "#000000dd",
           color: "#fff",
-          height: "40px",
+          height: "30px",
           width: "300px",
-          backgroundColor: "#6666662f",
+          backgroundColor: "#000000dd",
           fontFamily: " afacad",
-          padding: "10px",
         },
       });
       return;
@@ -249,13 +248,12 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
       toast.warning("No se ha seleccionado ninguna imagen", {
         style: {
           borderRadius: "10px",
-          background: "#333",
+          background: "#000000dd",
           color: "#fff",
-          height: "40px",
+          height: "30px",
           width: "300px",
-          backgroundColor: "#6666662f",
-          fontFamily: "afacad",
-          padding: "10px",
+          backgroundColor: "#000000dd",
+          fontFamily: " afacad",
         },
       });
       return;
@@ -305,11 +303,11 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
      , {
        style: {
          borderRadius: "10px",
-         background: "#333",
+         background: "#000000dd",
          color: "#fff",
-         height: "25px",
-         width: "200px",
-         backgroundColor: "#6666662f",
+         height: "30px",
+         width: "300px",
+         backgroundColor: "#000000dd",
          fontFamily: " afacad",
        },
      });
@@ -350,11 +348,11 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
     <>
     <form
       onSubmit={handleFile}
-      className="flex flex-row gap-4 rounded font-afacad w-full justify-between items-center"
+      className="flex flex-row gap-4 rounded font-afacad items-center justify-center"
       method="POST"
     >
       {/*bloque para la imagen */}
-      <div className="grid place-items-center bg-black/80 p-1">
+      <div className="grid place-items-center bg-black/80 p-2 rounded">
         <h1 className="text-3xl text-center font-bold text-white drop-shadow-[2px_2px_2px_black]">
           CARGA DE IMAGENES
         </h1>
@@ -381,29 +379,28 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
               <button
                 type="button"
                 onClick={handleRemoveImage}
-                className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded shadow absolute top-2 right-1"
+                className="bg-black/30 hover:bg-black transition duration-300 ease-in-out  text-white text-xs px-2 py-1 rounded shadow absolute top-2 right-1"
               >
                 X
               </button>
               <img
                 src={URL.createObjectURL(formImg.url)}
-                alt="preview"
+                alt="previewCarga"
                 className=" aspect-[1/1] object-cover rounded w-full h-full mt-1 pb-3 border-opacity-90 shadow-[0_0_20px_5px_rgba(0,0,0,0.8)] hover:shadow-none transition duration-300 ease-in-out"
-                width={500}
-                height={500}
+
               />
             </>
           ) : typeof formImg.url === "string" ? ( <>
             <button
               type="button"
               onClick={handleRemoveImage}
-              className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded shadow absolute top-2 right-1"
+              className="bg-black/30 hover:bg-black transition duration-300 ease-in-out text-white text-xs px-2 py-1 rounded shadow absolute top-2 right-1"
             >
               X
             </button>
             <Image
               src={formImg.url}
-              alt="preview"
+              alt="previewEdit"
               className="aspect-[1/1] object-cover rounded w-full h-full mt-1 pb-3 border-opacity-90 shadow-[0_0_20px_5px_rgba(0,0,0,0.8)] hover:shadow-none transition duration-300 ease-in-out"
               width={500}
               height={500}
@@ -422,10 +419,10 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
       </div>
       {/*bloque para los datos adicionales */}
       <div className="flex flex-col items-center h-[480px] w-[300px]">
-        <div className="flex flex-col bg-black/80 w-[250px] text-center rounded">
+        <div className="flex flex-col bg-black/80 w-[250px] text-center rounded p-2.5">
           <label htmlFor="title">TITULO</label>
           <input
-            className="text-white bg-transparent border rounded border-gray-100 focus:outline-none pulse-border"
+            className="text-white bg-transparent border rounded border-gray-100 focus:outline-none"
             type="text"
             name="title"
             id="title"
@@ -433,18 +430,21 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
             value={formImg.title}
           />
         </div>
-        <div className="flex flex-col bg-black/80 w-[250px] text-center rounded mt-1 ">
+        <div className="flex flex-col bg-black/80 w-[250px] text-center rounded mt-1">
+          <div className="flex flex-col p-2.5" >
           <label htmlFor="history">HISTORIA</label>
           <textarea
             name="history"
             id="history"
             onChange={handleTextAreaChange}
             value={formImg.history}
-            className=" w-[250px] text-white bg-transparent border rounded border-gray-100 focus:outline-none pulse-border "
+            className=" resize-none text-white bg-transparent border rounded border-gray-100 focus:outline-none "
             rows={3}
             cols={20}
             maxLength={MAX_HISTORY_LENGTH}
+            
           />
+          </div>
           <div className={`text-right text-xs mt-1 pr-2 ${getCounterColor()}`}>
           {formImg.history?.length}/{MAX_HISTORY_LENGTH}
           </div>
@@ -452,7 +452,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
         {/* bloque selector para la categoria */}
 
         {selectCategory ? (
-          <div className="flex flex-col bg-black/80 h-[100px] w-[250px] text-center p-2 rounded mt-1">
+          <div className="flex flex-col bg-black/80 h-[100px] w-[250px] text-center p-2.5 rounded mt-1">
             <label className="mt-2" htmlFor="category">
               CREAR CATEGORIA
             </label>
@@ -563,7 +563,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
       {/* bloque para ver el preview*/}
       <div
         className="
-     rounded flex flex-col gap-2 w-[300px] h-[480px] justify-start bg-black/70 overflow-hidden
+     rounded flex flex-col gap-2 w-[300px] h-[480px] justify-start bg-black/70 overflow-hidden p-2
   "
       >
         <p className="text-3xl text-center font-bold text-white drop-shadow-[2px_2px_2px_black] mb-2">
@@ -584,7 +584,7 @@ export function FormImage ({ onSubmit, defaultValue, mode }: IformImage) {
 
           <div className="mt-2">
             <strong>HISTORIA:</strong>
-            <div className="max-h-[180px] overflow-y-auto overflow-x-hidden p-1 mt-1 bg-black/30 rounded text-sm text-white whitespace-pre-wrap break-words">
+            <div className="max-h-[180px] overflow-y-auto overflow-x-hidden p-1 mt-1 rounded text-sm text-white whitespace-pre-wrap break-words">
               <p className="whitespace-pre-wrap">{formImg.history}</p>
             </div>
           </div>

@@ -112,15 +112,14 @@ export default function Multimedia() {
     setModalIsOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = async (event: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
     if (fotoIdToDelete == null) return
       console.log("fotoIdToDelete", fotoIdToDelete);
       
         await handleDelete(fotoIdToDelete);
         setModalIsOpen(false);
         setFotoIdToDelete(null);
-      
-        
       
   };
 
@@ -210,10 +209,10 @@ export default function Multimedia() {
         <h1>No te encontras registrado</h1>
       )}
           <Modal isOpen={isModalOpen} onClose={() => toggleModal(null)}>
-          <div className=" w-[60vw] h-[40vh] flex justify-center items-center">
-
+          <div className=" w-[45vw] h-[70vh]  flex justify-center items-center">
+       
           <Image
-  className="w-full h-auto object-contain"
+  className="w-full h-full object-cover rounded-sm"
   src={imageUrl}
   alt={title || "Imagen"}
   width={4120}
@@ -226,7 +225,7 @@ export default function Multimedia() {
           REORDENAR
         </button>
       )}
-          <ConfirmModal isOpen={(modalIsOpen)} onClose={() => setModalIsOpen(false)} onConfirm={handleConfirmDelete} title={"Eliminar Fotos"} message={"Estas seguro de eliminar esta foto?"} />
+          <ConfirmModal isOpen={(modalIsOpen)} onClose={() => setModalIsOpen(false)} onConfirm={handleConfirmDelete} title={"Eliminar"} message={"Estas seguro de eliminar esta foto?"} />
 
     </div>
   );
