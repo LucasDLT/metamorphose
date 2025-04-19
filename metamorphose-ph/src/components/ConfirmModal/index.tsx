@@ -10,20 +10,20 @@ export const ConfirmModal: React.FC<IConfirmModal> = ({ isOpen, onClose, onConfi
     if (!isOpen) return null;
     return (
         <form onSubmit={onConfirm}
-        className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
-            <div className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-lg font-semibold mb-2">{title}</h2>
-                <p className="text-gray-600">{message}</p>
+        className="fixed inset-0  flex justify-center items-center z-50">
+            <div className="bg-black p-4 rounded-lg shadow-md text-center flex flex-col items-center">
+                <h2 className="text-white text-lg font-semibold mb-2 tracking-wide">{title}</h2>
+                <p className="text-white">{message}</p>
                 <div className="flex justify-end mt-4">
                     <button
                         onClick={onClose}
-                        className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2"
+                        className="bg-gray-900 transition duration-300 ease-in-out hover:bg-gray-700 text-white px-4 py-2 rounded-md mr-2"
                         type="button"
                     >
                         Cancelar
                     </button>
                     <button 
-                        className="bg-red-500 text-white px-4 py-2 rounded-md"
+                        className="bg-zinc-900 hover:bg-zinc-800 transition duration-300 ease-in-out text-white px-4 py-2 rounded-md"
                         type="submit"
                     >
                         Confirmar
